@@ -67,7 +67,7 @@
       ]
     },
     {
-      "source": "/windows_11_cursors_concept_by_jepricreations_densjkc/**",
+      "source": "/windows_11_cursors_concept_by_jepricreations_densjkc/:path*",
       "headers": [
         {
           "key": "Cache-Control",
