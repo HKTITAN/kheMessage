@@ -1,0 +1,5101 @@
+<!DOCTYPE html>
+<!--
+  kheMessage — https://msg.khe.money
+  FILE STRUCTURE:
+  - Lines 1–10:   DOCTYPE, meta, links, title
+  - Lines 11–~800:  <style> — Reset, themes, layout, components, responsive
+  - Lines ~800–1800: <header>, <main>, <aside> — HTML structure
+  - Lines ~1800–4400: <script> — Block model, compression, encryption, UI logic, init
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fafaf9" id="theme-color-meta">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<title>kheMessage</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.4s ease;
+  }
+
+  /* Honor prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Light theme (default + .light) */
+  html,
+  html.light {
+    --cursor-light: url('windows_11_cursors_concept_by_jepricreations_densjkc/light/arrow.cur'), auto;
+    --cursor-text: url('windows_11_cursors_concept_by_jepricreations_densjkc/light/ibeam.cur'), text;
+    --cursor-pointer: url('windows_11_cursors_concept_by_jepricreations_densjkc/light/hand.cur'), pointer;
+    --cursor-not-allowed: url('windows_11_cursors_concept_by_jepricreations_densjkc/light/no.cur'), not-allowed;
+    --bg: #fafaf9;
+    --bg-elevated: #ffffff;
+    --text: #1c1917;
+    --text-muted: rgba(28, 25, 23, 0.65);
+    --border: rgba(28, 25, 23, 0.1);
+    --link: #0b6bcb;
+    --link-hover: #055a9e;
+    --code-bg: rgba(28, 25, 23, 0.06);
+    --hover: rgba(28, 25, 23, 0.06);
+    --placeholder: rgba(28, 25, 23, 0.4);
+    --outline: #0b6bcb;
+    --btn-bg: #ffffff;
+    --btn-border: rgba(28, 25, 23, 0.12);
+    --btn-hover: rgba(28, 25, 23, 0.04);
+    background-color: var(--bg);
+  }
+
+  html.dark {
+    --cursor-light: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/arrow.cur'), auto;
+    --cursor-text: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/ibeam.cur'), text;
+    --cursor-pointer: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/hand.cur'), pointer;
+    --cursor-not-allowed: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/no.cur'), not-allowed;
+    --bg: #1c1917;
+    --bg-elevated: #292524;
+    --text: #fafaf9;
+    --text-muted: rgba(250, 250, 249, 0.7);
+    --border: rgba(250, 250, 249, 0.1);
+    --link: #7dd3fc;
+    --link-hover: #bae6fd;
+    --code-bg: rgba(250, 250, 249, 0.06);
+    --hover: rgba(250, 250, 249, 0.06);
+    --placeholder: rgba(250, 250, 249, 0.45);
+    --outline: #7dd3fc;
+    --btn-bg: #292524;
+    --btn-border: rgba(250, 250, 249, 0.12);
+    --btn-hover: rgba(250, 250, 249, 0.08);
+    background-color: var(--bg);
+  }
+
+  /* System preference when no ?theme= in URL (set by JS) */
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not(.dark) {
+      --cursor-light: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/arrow.cur'), auto;
+      --cursor-text: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/ibeam.cur'), text;
+      --cursor-pointer: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/hand.cur'), pointer;
+      --cursor-not-allowed: url('windows_11_cursors_concept_by_jepricreations_densjkc/dark/no.cur'), not-allowed;
+      --bg: #1c1917;
+      --bg-elevated: #292524;
+      --text: #fafaf9;
+      --text-muted: rgba(250, 250, 249, 0.7);
+      --border: rgba(250, 250, 249, 0.1);
+      --link: #7dd3fc;
+      --link-hover: #bae6fd;
+      --code-bg: rgba(250, 250, 249, 0.06);
+      --hover: rgba(250, 250, 249, 0.06);
+      --placeholder: rgba(250, 250, 249, 0.45);
+      --outline: #7dd3fc;
+      --btn-bg: #292524;
+      --btn-border: rgba(250, 250, 249, 0.12);
+      --btn-hover: rgba(250, 250, 249, 0.08);
+      background-color: var(--bg);
+    }
+  }
+
+  body {
+    color: var(--text);
+    font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
+    transition: color 0.4s ease;
+    cursor: var(--cursor-light);
+  }
+
+  article,
+  [contenteditable="plaintext-only"],
+  [contenteditable="true"] {
+    cursor: var(--cursor-text);
+  }
+
+  a,
+  button,
+  [role="button"],
+  [role="menuitem"],
+  .nav-btn,
+  .icon-btn,
+  #save-btn,
+  .md-url {
+    cursor: var(--cursor-pointer);
+  }
+
+  #save-btn:disabled {
+    cursor: var(--cursor-not-allowed);
+  }
+
+  /* Animate theme switch on UI elements */
+  #brand,
+  #qrcode-wrap,
+  #panel .actions a,
+  #theme-toggle,
+  #notification {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  /* Top branding */
+  #brand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  #brand a {
+    color: var(--text);
+    border: none;
+  }
+
+  #brand a:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #brand a:hover {
+    color: var(--text-muted);
+    border: none;
+  }
+
+  #brand .brand-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Brand hover morph: kheMessage → msg.khe.money */
+  #brand .brand-link {
+    display: inline-block;
+    position: relative;
+    min-width: 6.5em;
+  }
+  #brand .brand-link .brand-default,
+  #brand .brand-link .brand-hover {
+    display: inline-block;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  #brand .brand-link .brand-hover {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  #brand .brand-link:hover .brand-default {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  #brand .brand-link:hover .brand-hover {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #save-btn {
+    min-width: 64px;
+    padding: 0 12px;
+    height: 36px;
+    font-size: 13px;
+    font-family: inherit;
+    border-radius: 999px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #save-btn:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #save-btn:hover { background: var(--btn-hover); border-color: var(--border); }
+  #save-btn:disabled { opacity: 0.7; cursor: default; }
+  #save-btn.saved { color: var(--outline); }
+
+  #theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--btn-border);
+    border-radius: 50%;
+    background: var(--btn-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #theme-toggle:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #theme-toggle:hover {
+    background: var(--btn-hover);
+    border-color: var(--border);
+  }
+
+  #theme-toggle:active {
+    transform: scale(0.96);
+  }
+
+  #theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  #theme-toggle .icon-sun { display: block; }
+  #theme-toggle .icon-moon { display: none; }
+  html.dark #theme-toggle .icon-sun { display: none; }
+  html.dark #theme-toggle .icon-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not(.dark) #theme-toggle .icon-sun { display: none; }
+    html:not(.light):not(.dark) #theme-toggle .icon-moon { display: block; }
+  }
+
+  #brand .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #brand .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--btn-border);
+    border-radius: 50%;
+    background: var(--btn-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #brand .nav-btn:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #brand .nav-btn:hover {
+    background: var(--btn-hover);
+    border-color: var(--border);
+  }
+
+  #brand .nav-btn svg { width: 18px; height: 18px; }
+
+  #lock-btn .lock-icon-open { display: block; }
+  #lock-btn .lock-icon-closed { display: none; }
+  #lock-btn.is-locked .lock-icon-open { display: none; }
+  #lock-btn.is-locked .lock-icon-closed { display: block; }
+  #lock-btn.is-locked { color: var(--outline); }
+  #lock-btn.is-locked:hover { background: var(--btn-hover); color: var(--outline); }
+
+  #brand .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 280px;
+    max-width: 90vw;
+    max-height: 75vh;
+    overflow: hidden;
+    flex-direction: column;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    z-index: 20;
+    display: none;
+    overscroll-behavior: contain;
+  }
+
+  #brand .nav-dropdown-wrap { position: relative; }
+  #brand .nav-dropdown.visible { display: flex; }
+
+  #brand .nav-dropdown > a,
+  #brand .nav-dropdown > button:not(.icon-btn):not(.reset-btn) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s ease;
+    touch-action: manipulation;
+  }
+
+  #brand .nav-dropdown > a:focus-visible,
+  #brand .nav-dropdown > button:not(.icon-btn):not(.reset-btn):focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: -2px;
+  }
+
+  #brand .nav-dropdown > a:hover,
+  #brand .nav-dropdown > button:not(.icon-btn):not(.reset-btn):hover { background: var(--hover); }
+
+  #history-dropdown .history-section-label {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  #history-dropdown .history-graph-container {
+    padding: 0 16px 12px;
+    min-height: 56px;
+    max-height: 200px;
+    overflow: auto;
+    border-bottom: 1px solid var(--border);
+    overscroll-behavior: contain;
+  }
+
+  #history-dropdown .history-graph-container svg {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  #history-dropdown .history-graph-vertical {
+    padding: 0 16px 12px;
+    max-height: 140px;
+    overflow: auto;
+    border-bottom: 1px solid var(--border);
+    overscroll-behavior: contain;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.1s ease;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: -2px;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row:hover { background: var(--hover); }
+  #history-dropdown .history-graph-vertical .version-row.current { color: var(--outline); font-weight: 500; }
+  #history-dropdown .history-graph-vertical .version-row.previewing { color: var(--link); }
+
+  #history-dropdown .history-graph-vertical .version-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row.current .version-dot { background: var(--outline); }
+  #history-dropdown .history-graph-vertical .version-row.previewing .version-dot { background: var(--link); }
+
+  #history-dropdown .history-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #history-dropdown .history-actions .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--btn-border);
+    border-radius: 50%;
+    background: var(--btn-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #history-dropdown .history-actions .icon-btn:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #history-dropdown .history-actions .icon-btn:hover {
+    background: var(--btn-hover);
+    border-color: var(--border);
+  }
+
+  #history-dropdown .history-actions .icon-btn:active {
+    transform: scale(0.96);
+  }
+
+  #history-dropdown .history-actions .icon-btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  #history-dropdown .history-actions .reset-btn {
+    margin-left: auto;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.1s ease, border-color 0.1s ease;
+    touch-action: manipulation;
+  }
+
+  #history-dropdown .history-actions .reset-btn:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #history-dropdown .history-actions .reset-btn:hover {
+    background: var(--btn-hover);
+    border-color: var(--border);
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  a:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
+  }
+
+  /* Page content: clear of brand bar and bottom panel */
+  article {
+    outline: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 88px 24px 200px;
+    padding-right: max(24px, 168px);
+    padding-top: 88px;
+    min-height: 100dvh;
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+    font-family: "Instrument Serif", Georgia, serif;
+    tab-size: 4;
+    white-space: pre-wrap;
+    text-wrap-style: stable;
+    overflow-wrap: break-word;
+    transition: color 0.4s ease;
+  }
+
+  article[data-empty="true"]::before {
+    content: "Start writing…";
+    color: var(--placeholder);
+    pointer-events: none;
+  }
+
+  /* Serif heading hierarchy */
+  .md-h1, .md-h2, .md-h3, .md-h4, .md-h5, .md-h6 {
+    font-weight: 400;
+    margin-top: 1.4em;
+    margin-bottom: 0.25em;
+    line-height: 1.35;
+    font-family: "Instrument Serif", Georgia, serif;
+    text-wrap: balance;
+  }
+
+  .md-h1 { font-size: 2em; margin-top: 0; }
+  .md-h2 { font-size: 1.6em; }
+  .md-h3 { font-size: 1.35em; }
+  .md-h4 { font-size: 1.2em; }
+  .md-h5 { font-size: 1.05em; }
+  .md-h6 { font-size: 1em; color: var(--text-muted); }
+
+  .md-code {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+
+  .md-codeblock {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-size: 0.875em;
+    line-height: 1.5;
+    background: var(--code-bg);
+    padding: 1em 1.2em;
+    border-radius: 4px;
+    display: block;
+    margin: 0.5em 0;
+    overflow-x: auto;
+  }
+
+  .md-bold { font-weight: 700; }
+  .md-strike { text-decoration: line-through; color: var(--text-muted); }
+  .md-italic { font-style: italic; }
+  .md-url { cursor: pointer; }
+
+  /* Fixed bottom-right: QR code only */
+  #panel {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 10;
+    pointer-events: auto;
+  }
+
+  #qrcode-wrap {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  html.dark #qrcode-wrap { box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25); }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not(.dark) #qrcode-wrap { box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25); }
+  }
+
+  #qrcode {
+    display: block;
+    width: 112px;
+    height: 112px;
+  }
+
+  #qrcode svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Dark mode: light modules on dark background (scannable, matches theme) */
+  html.dark #qrcode svg rect {
+    fill: #292524;
+  }
+  html.dark #qrcode svg path {
+    fill: #fafaf9;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not(.dark) #qrcode svg rect {
+      fill: #292524;
+    }
+    html:not(.light):not(.dark) #qrcode svg path {
+      fill: #fafaf9;
+    }
+  }
+
+  /* Responsive: mobile */
+  @media (max-width: 768px) {
+    #brand {
+      padding: 12px 16px;
+      font-size: 1.1rem;
+    }
+
+    #theme-toggle,
+    #lock-btn {
+      width: 32px;
+      height: 32px;
+    }
+
+    #theme-toggle svg,
+    #lock-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    article {
+      padding: 72px 16px 220px;
+      padding-right: 16px;
+      padding-top: 72px;
+      font-size: 17px;
+    }
+
+    #panel {
+      right: 16px;
+      bottom: 20px;
+    }
+
+    #qrcode-wrap {
+      padding: 10px;
+    }
+
+    #qrcode {
+      width: 96px;
+      height: 96px;
+    }
+
+    #notification {
+      left: 16px;
+      right: 16px;
+      top: 64px;
+    }
+  }
+
+  #notification {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    position: fixed;
+    right: 24px;
+    top: 72px;
+    padding: 10px 16px;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 12;
+  }
+
+  #notification.visible {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  #history-graph {
+    display: block;
+    width: 100%;
+    min-width: 180px;
+    min-height: 60px;
+  }
+
+  #history-graph .node {
+    cursor: pointer;
+    transition: fill 0.15s ease;
+  }
+
+  #history-graph .node:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #history-graph .node:hover { opacity: 0.9; }
+  #history-graph .node.current { stroke: var(--outline); stroke-width: 2; }
+  #history-graph .node.previewing { stroke: var(--link); stroke-width: 2; }
+  #history-graph .node.merge { stroke: var(--link); stroke-width: 1.5; }
+
+  #editor-wrap {
+    position: relative;
+    transition: box-shadow 0.25s ease;
+  }
+
+  #editor-wrap.preview-mode {
+    border-radius: 12px;
+    box-shadow: 0 0 0 2px var(--outline), 0 0 0 4px var(--bg), 0 0 32px rgba(11, 107, 203, 0.2);
+  }
+
+  html.dark #editor-wrap.preview-mode {
+    box-shadow: 0 0 0 2px var(--outline), 0 0 0 4px var(--bg), 0 0 32px rgba(125, 211, 252, 0.15);
+  }
+
+  #preview-banner {
+    display: none;
+    position: fixed;
+    top: 57px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(720px, calc(100vw - 48px));
+    z-index: 6;
+    padding: 12px 24px;
+    background: var(--outline);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 0 0 12px 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  #editor-wrap.preview-mode #preview-banner {
+    display: flex;
+  }
+
+  #editor-wrap.preview-mode article {
+    padding-top: 130px;
+  }
+
+  #preview-banner-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  #preview-banner-actions a, #preview-banner-actions button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #preview-banner-actions a:focus-visible,
+  #preview-banner-actions button:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.6);
+    outline-offset: 2px;
+  }
+
+  #preview-banner-actions a:hover, #preview-banner-actions button:hover {
+    background: rgba(255,255,255,0.35);
+  }
+
+  #preview-banner-actions .btn-primary {
+    background: rgba(255,255,255,0.9);
+    color: var(--outline);
+    font-weight: 500;
+  }
+
+  #preview-banner-actions .btn-primary:hover {
+    background: #fff;
+  }
+
+  #preview-banner-actions .btn-secondary {
+    background: rgba(255,255,255,0.2);
+  }
+
+  #preview-banner-actions .btn-secondary:hover {
+    background: rgba(255,255,255,0.35);
+  }
+
+  #unlock-banner {
+    position: fixed;
+    top: 57px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(720px, calc(100vw - 48px));
+    z-index: 6;
+    padding: 12px 24px;
+    background: var(--outline);
+    color: var(--bg);
+    font-size: 14px;
+    border-radius: 0 0 12px 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  #editor-wrap.encrypted-mode #unlock-banner {
+    display: flex !important;
+  }
+
+  #editor-wrap.encrypted-mode #blocks-container {
+    padding-top: 130px;
+  }
+
+  #unlock-banner-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+  }
+
+  #unlock-password {
+    padding: 6px 40px 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.2);
+    color: inherit;
+    font-size: 14px;
+    font-family: inherit;
+    min-width: 140px;
+  }
+
+  #unlock-password::placeholder {
+    color: rgba(255,255,255,0.6);
+  }
+
+  #unlock-password:focus {
+    outline: 2px solid rgba(255,255,255,0.6);
+    outline-offset: 2px;
+  }
+
+  #unlock-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: rgba(255,255,255,0.25);
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #unlock-btn:hover {
+    background: rgba(255,255,255,0.35);
+  }
+
+  #unlock-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+
+  .password-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .password-wrap input {
+    padding-right: 36px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  .password-toggle:hover {
+    opacity: 1;
+  }
+
+  #password-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #password-modal-overlay.visible {
+    display: flex;
+  }
+
+  #password-modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 360px;
+    width: 90vw;
+  }
+
+  #password-modal h3 {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+  }
+
+  #password-modal input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  #password-modal .password-row {
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  #password-modal .password-row input {
+    margin-bottom: 0;
+    padding-right: 40px;
+  }
+
+  #password-modal .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #password-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  #password-modal-actions button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--text);
+  }
+
+  /* Diff modal (version compare) */
+  #diff-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  #diff-modal-overlay.visible {
+    display: flex;
+  }
+
+  .diff-modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .diff-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .diff-modal-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+
+  .modal-close:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+
+  .diff-modal-labels {
+    display: flex;
+    gap: 0;
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .diff-label-base { flex: 1; }
+  .diff-label-compare { flex: 1; }
+
+  .diff-content {
+    overflow: auto;
+    padding: 12px 20px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .diff-line {
+    padding: 2px 8px;
+    margin: 0 -8px;
+    border-radius: 4px;
+  }
+
+  .diff-line-add {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--text);
+  }
+
+  html.dark .diff-line-add {
+    background: rgba(34, 197, 94, 0.15);
+  }
+
+  .diff-line-remove {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--text);
+  }
+
+  html.dark .diff-line-remove {
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  .diff-line-unchanged {
+    color: var(--text-muted);
+  }
+
+  /* Version history UX improvements */
+  #history-dropdown .history-graph-vertical .version-row {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-id {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-date {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-merge-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--link);
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 4px;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0.7;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row:hover .version-actions,
+  #history-dropdown .history-graph-vertical .version-row:focus-within .version-actions {
+    opacity: 1;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-action-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+
+  #history-dropdown .history-graph-vertical .version-row .version-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #history-dropdown .history-empty {
+    padding: 12px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  @media print {
+    .noprint { visibility: hidden !important; }
+  }
+
+  /* ============================================
+     BLOCK EDITOR STYLES
+     ============================================ */
+
+  /* Color variables for status indicators */
+  html, html.light {
+    --color-success: #22c55e;
+    --color-warning: #eab308;
+    --color-danger: #f97316;
+    --color-error: #ef4444;
+  }
+
+  html.dark {
+    --color-success: #4ade80;
+    --color-warning: #facc15;
+    --color-danger: #fb923c;
+    --color-error: #f87171;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not(.dark) {
+      --color-success: #4ade80;
+      --color-warning: #facc15;
+      --color-danger: #fb923c;
+      --color-error: #f87171;
+    }
+  }
+
+  /* Block container */
+  #blocks-container {
+    outline: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 88px 24px 80px;
+    padding-right: max(24px, 168px);
+    min-height: calc(100dvh - 32px);
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+    font-family: "Instrument Serif", Georgia, serif;
+  }
+
+  /* Individual block */
+  .block {
+    position: relative;
+    padding: 4px 0 4px 28px;
+    margin: 2px 0;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+  }
+
+  /* Drag handle */
+  .block-handle {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    cursor: grab;
+    color: var(--text-muted);
+    border-radius: 4px;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    touch-action: none;
+  }
+
+  .block-handle:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+    opacity: 1;
+  }
+
+  .block:hover .block-handle,
+  .block:focus-within .block-handle {
+    opacity: 1;
+  }
+
+  .block-handle:hover {
+    background: var(--border);
+  }
+
+  .block-handle:active {
+    cursor: grabbing;
+  }
+
+  .block-handle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Block content */
+  .block-content {
+    outline: none;
+    min-height: 1.6em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .block-content:empty::before {
+    content: attr(data-placeholder);
+    color: var(--placeholder);
+    pointer-events: none;
+  }
+
+  /* At URL limit: typing blocked, backspace allowed */
+  .block-content.at-limit {
+    cursor: var(--cursor-not-allowed);
+  }
+
+  /* Notion-style indentation (Tab / Shift+Tab) — handle moves with indent */
+  .block[data-depth="0"] .block-handle { left: 0; }
+  .block[data-depth="1"] { padding-left: 52px; }
+  .block[data-depth="1"] .block-handle { left: 24px; }
+  .block[data-depth="2"] { padding-left: 76px; }
+  .block[data-depth="2"] .block-handle { left: 48px; }
+  .block[data-depth="3"] { padding-left: 100px; }
+  .block[data-depth="3"] .block-handle { left: 72px; }
+  .block[data-depth="4"] { padding-left: 124px; }
+  .block[data-depth="4"] .block-handle { left: 96px; }
+  .block[data-depth="5"] { padding-left: 148px; }
+  .block[data-depth="5"] .block-handle { left: 120px; }
+
+  .block[data-depth="1"][data-type="bullet"]::before { left: 52px; }
+  .block[data-depth="2"][data-type="bullet"]::before { left: 76px; }
+  .block[data-depth="3"][data-type="bullet"]::before { left: 100px; }
+  .block[data-depth="4"][data-type="bullet"]::before { left: 124px; }
+  .block[data-depth="5"][data-type="bullet"]::before { left: 148px; }
+
+  .block[data-depth="1"][data-type="number"]::before { left: 52px; }
+  .block[data-depth="2"][data-type="number"]::before { left: 76px; }
+  .block[data-depth="3"][data-type="number"]::before { left: 100px; }
+  .block[data-depth="4"][data-type="number"]::before { left: 124px; }
+  .block[data-depth="5"][data-type="number"]::before { left: 148px; }
+
+  .block[data-depth="1"][data-type="todo"] .todo-checkbox { left: 52px; }
+  .block[data-depth="2"][data-type="todo"] .todo-checkbox { left: 76px; }
+  .block[data-depth="3"][data-type="todo"] .todo-checkbox { left: 100px; }
+  .block[data-depth="4"][data-type="todo"] .todo-checkbox { left: 124px; }
+  .block[data-depth="5"][data-type="todo"] .todo-checkbox { left: 148px; }
+
+  .block[data-depth="1"][data-type="callout"] .callout-emoji { left: 64px; }
+  .block[data-depth="2"][data-type="callout"] .callout-emoji { left: 88px; }
+  .block[data-depth="3"][data-type="callout"] .callout-emoji { left: 112px; }
+  .block[data-depth="4"][data-type="callout"] .callout-emoji { left: 136px; }
+  .block[data-depth="5"][data-type="callout"] .callout-emoji { left: 160px; }
+
+  .block[data-depth="1"][data-type="toggle"] .toggle-icon { left: 52px; }
+  .block[data-depth="2"][data-type="toggle"] .toggle-icon { left: 76px; }
+  .block[data-depth="3"][data-type="toggle"] .toggle-icon { left: 100px; }
+  .block[data-depth="4"][data-type="toggle"] .toggle-icon { left: 124px; }
+  .block[data-depth="5"][data-type="toggle"] .toggle-icon { left: 148px; }
+
+  /* Block types */
+  .block[data-type="h1"] .block-content { font-size: 2em; font-weight: 600; line-height: 1.2; text-wrap: balance; }
+  .block[data-type="h2"] .block-content { font-size: 1.6em; font-weight: 600; line-height: 1.25; text-wrap: balance; }
+  .block[data-type="h3"] .block-content { font-size: 1.35em; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+  .block[data-type="h4"] .block-content { font-size: 1.2em; font-weight: 600; text-wrap: balance; }
+  .block[data-type="h5"] .block-content { font-size: 1.05em; font-weight: 600; text-wrap: balance; }
+  .block[data-type="h6"] .block-content { font-size: 1em; font-weight: 600; color: var(--text-muted); text-wrap: balance; }
+
+  .block[data-type="bullet"] { padding-left: 44px; }
+  .block[data-type="bullet"]::before {
+    content: "•";
+    position: absolute;
+    left: 28px;
+    color: var(--text-muted);
+  }
+
+  .block[data-type="number"] { padding-left: 44px; }
+  .block[data-type="number"]::before {
+    content: attr(data-number) ".";
+    position: absolute;
+    left: 28px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+  }
+
+  .block[data-type="todo"] { padding-left: 52px; }
+  .block[data-type="todo"] .todo-checkbox {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .block[data-type="todo"] .todo-checkbox:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  .block[data-type="todo"] .todo-checkbox:hover {
+    border-color: var(--text-muted);
+  }
+
+  .block[data-type="todo"][data-checked="true"] .todo-checkbox {
+    background: var(--outline);
+    border-color: var(--outline);
+  }
+
+  .block[data-type="todo"][data-checked="true"] .todo-checkbox svg {
+    color: var(--bg);
+  }
+
+  .block[data-type="todo"][data-checked="true"] .block-content {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .block[data-type="code"] .block-content {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-size: 0.875em;
+    background: var(--code-bg);
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+
+  .block[data-type="quote"] {
+    padding-left: 44px;
+    border-left: 3px solid var(--border);
+    margin-left: 28px;
+    padding-left: 16px;
+  }
+
+  .block[data-type="quote"] .block-content {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .block[data-type="divider"] {
+    padding: 12px 0 12px 28px;
+  }
+
+  .block[data-type="divider"] .block-content {
+    height: 1px;
+    background: var(--border);
+    min-height: 1px;
+  }
+
+  .block[data-type="callout"] {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 12px 12px 12px 52px;
+    margin-left: 28px;
+  }
+
+  .block[data-type="callout"] .callout-emoji {
+    position: absolute;
+    left: 40px;
+    top: 12px;
+    font-size: 1.2em;
+  }
+
+  .block[data-type="toggle"] { padding-left: 52px; }
+  .block[data-type="toggle"] .toggle-icon {
+    position: absolute;
+    left: 28px;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: transform 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .block[data-type="toggle"] .toggle-icon:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  .block[data-type="toggle"][data-expanded="true"] .toggle-icon {
+    transform: rotate(90deg);
+  }
+
+  .block[data-type="toggle"] .toggle-children {
+    display: none;
+    margin-top: 4px;
+    padding-left: 24px;
+  }
+
+  .block[data-type="toggle"][data-expanded="true"] .toggle-children {
+    display: block;
+  }
+
+  /* Nested blocks */
+  .block-children {
+    margin-left: 24px;
+  }
+
+  /* Drop indicator — shows indent level (depth) when dragging */
+  .drop-indicator {
+    position: relative;
+    height: 3px;
+    margin-left: 0;
+    margin-right: 0;
+    background: var(--outline);
+    border-radius: 2px;
+    pointer-events: none;
+    display: none;
+    transition: margin-left 0.1s ease;
+  }
+
+  .drop-indicator[data-depth="0"] { margin-left: 28px; }
+  .drop-indicator[data-depth="1"] { margin-left: 52px; }
+  .drop-indicator[data-depth="2"] { margin-left: 76px; }
+  .drop-indicator[data-depth="3"] { margin-left: 100px; }
+  .drop-indicator[data-depth="4"] { margin-left: 124px; }
+  .drop-indicator[data-depth="5"] { margin-left: 148px; }
+
+  .drop-indicator.visible {
+    display: block;
+  }
+
+  /* Multi-select: selected blocks */
+  .block.selected {
+    background: var(--hover);
+    outline: 1px solid var(--border);
+    outline-offset: -1px;
+  }
+
+  /* Dragging state — all dragged blocks (parent + children) dimmed */
+  .block.dragging {
+    opacity: 0.5;
+  }
+
+  /* Slash command menu */
+  #slash-menu {
+    position: fixed;
+    z-index: 100;
+    min-width: 280px;
+    max-width: 320px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: none;
+    padding: 6px;
+    overscroll-behavior: contain;
+  }
+
+  #slash-menu.visible {
+    display: block;
+  }
+
+  .slash-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s ease;
+    touch-action: manipulation;
+  }
+
+  .slash-menu-item:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: -2px;
+  }
+
+  .slash-menu-item:hover,
+  .slash-menu-item.selected {
+    background: var(--hover);
+  }
+
+  .slash-menu-item-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--code-bg);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  .slash-menu-item-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .slash-menu-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .slash-menu-item-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .slash-menu-section {
+    padding: 8px 12px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  /* Status bar */
+  #status-bar .status-bar-github {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--btn-border);
+    border-radius: 50%;
+    background: var(--btn-bg);
+    color: var(--text);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  #status-bar .status-bar-github:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+  #status-bar .status-bar-github:hover {
+    background: var(--btn-hover);
+    border-color: var(--border);
+  }
+  #status-bar .status-bar-github:active {
+    transform: scale(0.96);
+  }
+  #status-bar .status-bar-github svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    z-index: 10;
+    gap: 16px;
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  #size-progress {
+    width: 100px;
+    min-width: 48px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  #size-progress:focus-visible {
+    outline: 2px solid var(--outline);
+    outline-offset: 2px;
+  }
+
+  #size-progress-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 3px;
+  }
+
+  #size-progress-fill.safe { background: var(--color-success); }
+  #size-progress-fill.warning { background: var(--color-warning); }
+  #size-progress-fill.danger { background: var(--color-danger); }
+  #size-progress-fill.critical { background: var(--color-error); }
+
+  /* At limit: block input, show full bar pulsing */
+  #status-bar.at-limit #size-progress-fill {
+    animation: limit-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes limit-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  #size-text {
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+
+  #block-count {
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  #size-warning {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-warning);
+    margin-left: auto;
+  }
+
+  #size-warning.visible {
+    display: flex;
+  }
+
+  .status-bar-version {
+    margin-left: auto;
+    font-size: 11px;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+
+  #status-bar .status-bar-github {
+    flex-shrink: 0;
+  }
+
+  #size-warning svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Size warning tooltip */
+  #size-tooltip {
+    position: fixed;
+    bottom: 40px;
+    right: 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 20;
+  }
+
+  #size-tooltip.visible {
+    display: block;
+  }
+
+  #size-tooltip h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  #size-tooltip ul {
+    list-style: none;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  #size-tooltip li {
+    padding: 2px 0;
+  }
+
+  #size-tooltip li::before {
+    content: "•";
+    margin-right: 8px;
+    color: var(--text-muted);
+  }
+
+  /* Inline formatting */
+  .inline-bold { font-weight: 700; }
+  .inline-italic { font-style: italic; }
+  .inline-strike { text-decoration: line-through; color: var(--text-muted); }
+  .inline-code {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+  .inline-link {
+    color: var(--link);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Empty state */
+  #blocks-container:empty::before {
+    content: "Type '/' for commands…";
+    color: var(--placeholder);
+    pointer-events: none;
+    display: block;
+    padding: 4px 0 4px 28px;
+  }
+
+  /* Adjust panel position for status bar */
+  #panel {
+    bottom: 56px;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    #blocks-container {
+      padding: 72px 16px 80px;
+      padding-right: 16px;
+      padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+
+    #status-bar {
+      height: 48px;
+      min-height: 48px;
+      padding: 0 12px;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      font-size: 11px;
+      gap: 10px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
+    #status-bar .status-bar-github {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      margin: 0 -8px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #status-bar .status-bar-github svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    #size-progress {
+      width: 56px;
+      min-width: 48px;
+      height: 6px;
+      flex-shrink: 0;
+    }
+
+    #size-text {
+      min-width: 72px;
+      font-size: 10px;
+    }
+
+    #block-count {
+      display: none;
+    }
+
+    .status-bar-version {
+      font-size: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100px;
+    }
+
+    #size-warning {
+      margin-left: auto;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #size-warning #size-warning-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .block {
+      padding-left: 24px;
+    }
+
+    .block-handle {
+      width: 20px;
+      height: 20px;
+    }
+
+    #panel {
+      bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+    }
+
+    #size-tooltip {
+      bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+      left: 12px;
+      right: 12px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 380px) {
+    #status-bar {
+      gap: 6px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+
+    .status-bar-version {
+      max-width: 72px;
+    }
+
+    #size-text {
+      min-width: 60px;
+    }
+  }
+</style>
+<header id="brand" class="noprint">
+  <div class="brand-left">
+    <a href="https://khe.money" class="brand-link" aria-label="kheMessage — msg.khe.money" title="msg.khe.money"><span class="brand-default" aria-hidden="true">kheMessage</span><span class="brand-hover" aria-hidden="true">msg.khe.money</span></a>
+  </div>
+  <div class="nav-actions">
+    <button type="button" id="save-btn" aria-label="Save" title="Save (Ctrl+S)"><span id="save-btn-text">Save</span></button>
+    <button type="button" id="new-note-btn" class="nav-btn" aria-label="New note" title="New note (Ctrl+N)">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    </button>
+    <div class="nav-dropdown-wrap">
+      <button type="button" id="history-btn" class="nav-btn" aria-label="History" aria-expanded="false" aria-haspopup="true">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </button>
+      <div id="history-dropdown" class="nav-dropdown" role="menu" aria-label="History">
+        <div class="history-actions">
+          <button type="button" id="history-undo" class="icon-btn" aria-label="Undo" title="Undo (Ctrl+Z)">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>
+          </button>
+          <button type="button" id="history-redo" class="icon-btn" aria-label="Redo" title="Redo (Ctrl+Y)">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9 21 3m0 0-6-6M21 3H9a6 6 0 0 0 0 12h3"/></svg>
+          </button>
+          <button type="button" id="history-reset" class="reset-btn" title="Clear history and start from latest">Reset</button>
+        </div>
+        <div class="history-graph-container" id="history-graph-container">
+          <svg id="history-graph" aria-label="Version history graph"></svg>
+        </div>
+        <div class="history-section-label">Versions</div>
+        <div class="history-graph-vertical" id="history-graph-vertical"></div>
+    </div>
+    </div>
+    <div class="nav-dropdown-wrap">
+      <button type="button" id="share-btn" class="nav-btn" aria-label="Share" aria-expanded="false" aria-haspopup="true">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
+      <div id="share-dropdown" class="nav-dropdown" role="menu" aria-label="Share">
+        <a href="#" id="share-copy-link" role="menuitem">Copy link</a>
+        <a href="#" id="share-export-txt" role="menuitem">Export TXT</a>
+        <a href="#" id="share-export-html" role="menuitem">Export HTML</a>
+        <a href="#" id="share-export-md" role="menuitem">Export MD</a>
+      </div>
+    </div>
+    <button type="button" id="lock-btn" class="nav-btn" aria-label="Lock note with password" title="Lock note with password">
+      <svg class="lock-icon-open" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V7a4 4 0 1 1 8 0"/><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/></svg>
+      <svg class="lock-icon-closed" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </button>
+    <button type="button" id="theme-toggle" class="nav-btn" aria-label="Toggle light/dark mode">
+      <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+<div id="editor-wrap">
+  <div id="unlock-banner" class="noprint" aria-live="polite" style="display:none">
+    <span id="unlock-banner-text">This note is encrypted. Enter the password to unlock.</span>
+    <div id="unlock-banner-actions">
+      <div class="password-wrap">
+        <input type="password" id="unlock-password" placeholder="Password" aria-label="Password" autocomplete="current-password">
+        <button type="button" class="password-toggle" id="unlock-password-toggle" aria-label="Show password" title="Show password">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <button type="button" id="unlock-btn">Unlock</button>
+    </div>
+  </div>
+  <div id="preview-banner" class="noprint" aria-live="polite">
+    <span id="preview-banner-text">Previewing an earlier version</span>
+    <div id="preview-banner-actions">
+      <button type="button" id="preview-compare" class="btn-secondary" title="View diff vs current">Compare</button>
+      <button type="button" id="preview-merge" class="btn-secondary" title="Merge this version into current">Merge</button>
+      <button type="button" id="preview-restore" class="btn-primary">Restore this version</button>
+      <button type="button" id="preview-back">Back to current</button>
+    </div>
+  </div>
+  <div id="blocks-container" role="textbox" aria-multiline="true" aria-label="Document editor"></div>
+</div>
+
+<!-- Password modal for Lock -->
+<div id="password-modal-overlay">
+  <div id="password-modal">
+    <h3>Lock note with password</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Content will be encrypted. Share the password separately with recipients.</p>
+    <div class="password-row">
+      <input type="password" id="lock-password" placeholder="Enter password" aria-label="Password" autocomplete="new-password">
+      <button type="button" class="password-toggle" id="lock-password-toggle" aria-label="Show password" title="Show password">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="password-row">
+      <input type="password" id="lock-password-confirm" placeholder="Confirm password" aria-label="Confirm password" autocomplete="new-password">
+      <button type="button" class="password-toggle" id="lock-password-confirm-toggle" aria-label="Show password" title="Show password">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div id="password-modal-actions">
+      <button type="button" id="password-modal-cancel">Cancel</button>
+      <button type="button" id="password-modal-confirm">Lock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diff modal (version compare) -->
+<div id="diff-modal-overlay" class="modal-overlay" aria-hidden="true">
+  <div id="diff-modal" class="diff-modal" role="dialog" aria-labelledby="diff-modal-title" aria-modal="true">
+    <div class="diff-modal-header">
+      <h3 id="diff-modal-title">Compare versions</h3>
+      <button type="button" id="diff-modal-close" class="modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="diff-modal-labels">
+      <span class="diff-label diff-label-base" id="diff-base-label">Current</span>
+      <span class="diff-label diff-label-compare" id="diff-compare-label">Selected version</span>
+    </div>
+    <div id="diff-content" class="diff-content"></div>
+  </div>
+</div>
+
+<!-- Slash Command Menu -->
+<div id="slash-menu" class="noprint" role="listbox" aria-label="Block types">
+  <div class="slash-menu-section">Basic Blocks</div>
+  <div class="slash-menu-item" data-type="p" role="option">
+    <div class="slash-menu-item-icon">¶</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Text</div>
+      <div class="slash-menu-item-desc">Plain text paragraph</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="h1" role="option">
+    <div class="slash-menu-item-icon">H1</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Heading 1</div>
+      <div class="slash-menu-item-desc">Large section heading</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="h2" role="option">
+    <div class="slash-menu-item-icon">H2</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Heading 2</div>
+      <div class="slash-menu-item-desc">Medium section heading</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="h3" role="option">
+    <div class="slash-menu-item-icon">H3</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Heading 3</div>
+      <div class="slash-menu-item-desc">Small section heading</div>
+    </div>
+  </div>
+  <div class="slash-menu-section">Lists</div>
+  <div class="slash-menu-item" data-type="bullet" role="option">
+    <div class="slash-menu-item-icon">•</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Bullet List</div>
+      <div class="slash-menu-item-desc">Unordered list item</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="number" role="option">
+    <div class="slash-menu-item-icon">1.</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Numbered List</div>
+      <div class="slash-menu-item-desc">Ordered list item</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="todo" role="option">
+    <div class="slash-menu-item-icon">☐</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">To-do</div>
+      <div class="slash-menu-item-desc">Checkbox item</div>
+    </div>
+  </div>
+  <div class="slash-menu-section">Advanced</div>
+  <div class="slash-menu-item" data-type="code" role="option">
+    <div class="slash-menu-item-icon">&lt;/&gt;</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Code</div>
+      <div class="slash-menu-item-desc">Code block</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="quote" role="option">
+    <div class="slash-menu-item-icon">"</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Quote</div>
+      <div class="slash-menu-item-desc">Quoted text</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="callout" role="option">
+    <div class="slash-menu-item-icon">💡</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Callout</div>
+      <div class="slash-menu-item-desc">Highlighted note</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="divider" role="option">
+    <div class="slash-menu-item-icon">—</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Divider</div>
+      <div class="slash-menu-item-desc">Horizontal rule</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-type="toggle" role="option">
+    <div class="slash-menu-item-icon">▶</div>
+    <div class="slash-menu-item-text">
+      <div class="slash-menu-item-title">Toggle</div>
+      <div class="slash-menu-item-desc">Collapsible content</div>
+    </div>
+  </div>
+</div>
+
+<!-- Size Warning Tooltip -->
+<div id="size-tooltip" class="noprint">
+  <h4 id="size-tooltip-title">Document is getting large</h4>
+  <ul id="size-tooltip-tips"></ul>
+</div>
+
+<aside id="panel" class="noprint">
+  <div id="qrcode-wrap">
+    <div id="qrcode" aria-hidden="true"></div>
+  </div>
+</aside>
+
+<!-- Status Bar -->
+<div id="status-bar" class="noprint">
+  <a href="https://github.com/HKTITAN/kheMessage" target="_blank" rel="noopener" class="github-icon status-bar-github" aria-label="GitHub">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2c2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2a4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0c-2.4-1.6-3.5-1.3-3.5-1.3a4.2 4.2 0 0 0-.1 3.2a4.6 4.6 0 0 0-1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6.6-.6 1.2-.5 2v3.5"/></svg>
+  </a>
+  <div id="size-progress" title="URL size">
+    <div id="size-progress-fill" class="safe"></div>
+  </div>
+  <span id="size-text">0 B / 8 KB</span>
+  <span id="block-count">0 blocks</span>
+  <div id="size-warning">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span id="size-warning-text">Large document</span>
+  </div>
+  <span id="status-bar-version" class="status-bar-version">msg.khe.money v.2026.02.01</span>
+</div>
+
+<div id="notification" class="noprint" role="status" aria-live="polite"></div>
+<script src="qrcode.js"></script>
+<script>
+  // ============================================
+  // BLOCK EDITOR - DATA MODEL AND CONSTANTS
+  // ============================================
+  
+  const BLOCK_TYPES = {
+    P: 0,        // Paragraph
+    H1: 1,       // Heading 1
+    H2: 2,       // Heading 2
+    H3: 3,       // Heading 3
+    H4: 4,       // Heading 4
+    H5: 5,       // Heading 5
+    H6: 6,       // Heading 6
+    BULLET: 7,   // Bullet list
+    NUMBER: 8,   // Numbered list
+    TODO: 9,     // Todo checkbox
+    CODE: 10,    // Code block
+    QUOTE: 11,   // Quote
+    CALLOUT: 12, // Callout
+    DIVIDER: 13, // Divider
+    TOGGLE: 14,  // Toggle
+    TABLE: 15,   // Table
+    TR: 16,      // Table row
+    TD: 17,      // Table cell
+    COLS: 18,    // Column container
+    COL: 19,     // Column
+    IMAGE: 20    // Image
+  }
+
+  const TYPE_NAMES = {
+    p: BLOCK_TYPES.P,
+    h1: BLOCK_TYPES.H1,
+    h2: BLOCK_TYPES.H2,
+    h3: BLOCK_TYPES.H3,
+    h4: BLOCK_TYPES.H4,
+    h5: BLOCK_TYPES.H5,
+    h6: BLOCK_TYPES.H6,
+    bullet: BLOCK_TYPES.BULLET,
+    number: BLOCK_TYPES.NUMBER,
+    todo: BLOCK_TYPES.TODO,
+    code: BLOCK_TYPES.CODE,
+    quote: BLOCK_TYPES.QUOTE,
+    callout: BLOCK_TYPES.CALLOUT,
+    divider: BLOCK_TYPES.DIVIDER,
+    toggle: BLOCK_TYPES.TOGGLE
+  }
+
+  const TYPE_LABELS = Object.fromEntries(
+    Object.entries(TYPE_NAMES).map(([k, v]) => [v, k])
+  )
+
+  const URL_THRESHOLDS = {
+    safe: 2000,
+    warning: 4000,
+    danger: 8000,
+    critical: 16000
+  }
+
+  const VERSION_KEY = 'kheMessage_localVersions'
+  const MAX_VERSIONS = 50
+  const BINARY_VERSION = 0x01
+
+  // ============================================
+  // BLOCK DATA MODEL
+  // ============================================
+  
+  let blocks = []
+  let focusedBlockIndex = -1
+  const selectedBlockIndices = new Set()
+  let lastClickedBlockIndex = -1
+  let previewHash = null
+  let versionRedoStack = []
+  let theme = null
+  let encryptedContent = null
+
+  const MAX_INDENT = 5
+
+  function createBlock(type = 'p', content = '', props = {}) {
+    const p = { ...props }
+    if (p.depth === undefined) p.depth = 0
+    return {
+      t: TYPE_NAMES[type] ?? BLOCK_TYPES.P,
+      c: content,
+      p: Object.keys(p).length ? p : undefined,
+      n: undefined // children
+    }
+  }
+
+  function getBlockDepth(block) {
+    return block.p?.depth ?? 0
+  }
+
+  function setBlockDepth(block, depth) {
+    block.p = block.p || {}
+    block.p.depth = Math.max(0, Math.min(MAX_INDENT, depth))
+  }
+
+  /** Returns [start, end] inclusive: block at index and all descendants (following blocks with depth > block depth until depth <= block depth). */
+  function getChildrenRange(index) {
+    if (index < 0 || index >= blocks.length) return [index, index]
+    const depth = getBlockDepth(blocks[index])
+    let end = index
+    for (let j = index + 1; j < blocks.length; j++) {
+      if (getBlockDepth(blocks[j]) <= depth) break
+      end = j
+    }
+    return [index, end]
+  }
+
+  /** Returns sorted array of indices to move: selected blocks plus all their children. Used for drag. */
+  function getBlocksToMove(draggedIndex, selectedSet) {
+    const sel = selectedSet && selectedSet.size ? selectedSet : new Set([draggedIndex])
+    const indices = new Set()
+    for (const i of sel) {
+      const [s, e] = getChildrenRange(i)
+      for (let k = s; k <= e; k++) indices.add(k)
+    }
+    return [...indices].sort((a, b) => a - b)
+  }
+
+  function getBlockText(block) {
+    if (typeof block.c === 'string') return block.c
+    if (Array.isArray(block.c)) {
+      return block.c.map(part => typeof part === 'string' ? part : part.c || '').join('')
+    }
+    return ''
+  }
+
+  function setBlockText(block, text) {
+    block.c = text
+  }
+
+  // ============================================
+  // BINARY SERIALIZATION
+  // ============================================
+  
+  function encodeVarint(num) {
+    const bytes = []
+    while (num >= 0x80) {
+      bytes.push((num & 0x7F) | 0x80)
+      num >>>= 7
+    }
+    bytes.push(num)
+    return bytes
+  }
+
+  function decodeVarint(bytes, offset) {
+    let result = 0
+    let shift = 0
+    let index = offset
+    while (index < bytes.length) {
+      const byte = bytes[index++]
+      result |= (byte & 0x7F) << shift
+      if (!(byte & 0x80)) break
+      shift += 7
+    }
+    return [result, index]
+  }
+
+  function serializeBlocks(blocks) {
+    const encoder = new TextEncoder()
+    const parts = []
+    
+    // Version byte
+    parts.push(new Uint8Array([BINARY_VERSION]))
+    
+    // Block count
+    parts.push(new Uint8Array(encodeVarint(blocks.length)))
+    
+    // Serialize each block
+    for (const block of blocks) {
+      // Type (1 byte)
+      parts.push(new Uint8Array([block.t]))
+      
+      // Flags
+      let flags = 0
+      if (block.p) flags |= 0x01
+      if (block.n && block.n.length) flags |= 0x02
+      parts.push(new Uint8Array([flags]))
+      
+      // Content
+      const text = getBlockText(block)
+      const textBytes = encoder.encode(text)
+      parts.push(new Uint8Array(encodeVarint(textBytes.length)))
+      parts.push(textBytes)
+      
+      // Properties (if present) - compact keys for smaller size
+      if (block.p) {
+        const compact = {}
+        for (const [k, v] of Object.entries(block.p)) {
+          const key = { lang: 'l', checked: 'c', start: 's', emoji: 'e', depth: 'd' }[k] ?? k
+          compact[key] = v
+        }
+        const propsJson = JSON.stringify(compact)
+        const propsBytes = encoder.encode(propsJson)
+        parts.push(new Uint8Array(encodeVarint(propsBytes.length)))
+        parts.push(propsBytes)
+      }
+      
+      // Children (if present) - recursive
+      if (block.n && block.n.length) {
+        const childBytes = serializeBlocks(block.n)
+        parts.push(new Uint8Array(encodeVarint(childBytes.length)))
+        parts.push(childBytes)
+      }
+    }
+    
+    // Combine all parts
+    const totalLength = parts.reduce((sum, p) => sum + p.length, 0)
+    const result = new Uint8Array(totalLength)
+    let offset = 0
+    for (const part of parts) {
+      result.set(part, offset)
+      offset += part.length
+    }
+    return result
+  }
+
+  function deserializeBlocks(bytes, offset = 0) {
+    const decoder = new TextDecoder()
+    const blocks = []
+    
+    // Check version
+    if (offset === 0) {
+      if (bytes[0] !== BINARY_VERSION) {
+        throw new Error('Unknown binary version')
+      }
+      offset = 1
+    }
+    
+    // Block count
+    let blockCount
+    [blockCount, offset] = decodeVarint(bytes, offset)
+    
+    for (let i = 0; i < blockCount; i++) {
+      // Type
+      const type = bytes[offset++]
+      
+      // Flags
+      const flags = bytes[offset++]
+      const hasProps = flags & 0x01
+      const hasChildren = flags & 0x02
+      
+      // Content
+      let contentLen
+      [contentLen, offset] = decodeVarint(bytes, offset)
+      const content = decoder.decode(bytes.slice(offset, offset + contentLen))
+      offset += contentLen
+      
+      const block = { t: type, c: content }
+      
+      // Properties - expand compact keys
+      if (hasProps) {
+        let propsLen
+        [propsLen, offset] = decodeVarint(bytes, offset)
+        const propsJson = decoder.decode(bytes.slice(offset, offset + propsLen))
+        offset += propsLen
+        const compact = JSON.parse(propsJson)
+        const expand = {}
+        for (const [k, v] of Object.entries(compact)) {
+          const key = { l: 'lang', c: 'checked', s: 'start', e: 'emoji', d: 'depth' }[k] ?? k
+          expand[key] = v
+        }
+        block.p = expand
+      }
+      
+      // Children
+      if (hasChildren) {
+        let childLen
+        [childLen, offset] = decodeVarint(bytes, offset)
+        const childBytes = bytes.slice(offset, offset + childLen)
+        offset += childLen
+        block.n = deserializeBlocks(childBytes, 0)
+      }
+      
+      blocks.push(block)
+    }
+    
+    return blocks
+  }
+
+  // ============================================
+  // BASE85 ENCODING (URL-safe, ~25% overhead vs base64 ~33%)
+  // ============================================
+  
+  const B85_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_~!$\'()*@%^`[]{}|;:<>'
+  const B85_DECODE = Object.fromEntries([...B85_ALPHABET].map((c, i) => [c, i]))
+  
+  function encodeBase85(bytes) {
+    const len = bytes.length
+    let result = ''
+    for (let i = 0; i < len; i += 4) {
+      let n = 0
+      const pad = Math.min(4, len - i)
+      for (let j = 0; j < 4; j++) {
+        const byte = (i + j < len) ? (bytes[i + j] ?? 0) : 0
+        n = ((n << 8) | byte) >>> 0
+      }
+      let block = ''
+      for (let k = 0; k < pad + 1; k++) {
+        block = B85_ALPHABET[n % 85] + block
+        n = Math.floor(n / 85) >>> 0
+      }
+      result += block
+    }
+    return result
+  }
+  
+  function decodeBase85(str) {
+    const len = str.length
+    const bytes = []
+    for (let i = 0; i < len; i += 5) {
+      let n = 0
+      const chunk = Math.min(5, len - i)
+      for (let k = 0; k < chunk; k++) {
+        const c = str[i + k]
+        const v = B85_DECODE[c]
+        if (v === undefined) throw new Error('Invalid base85 character: ' + c)
+        n = n * 85 + v
+      }
+      for (let j = 0; j < chunk - 1; j++) {
+        bytes.push(n >>> 24)
+        n = (n << 8) >>> 0
+      }
+    }
+    return new Uint8Array(bytes)
+  }
+  
+  function looksLikeBase85(str) {
+    if (!str || str.length < 2) return false
+    if (/[^A-Za-z0-9_-]/.test(str)) return true
+    return false
+  }
+  
+  // Format bytes: 0x01=deflate+base64url, 0x02=deflate+base85, 0x03=encrypted+base85, 0x04=brotli+base85
+  const FMT_DEFLATE_B64 = 0x01
+  const FMT_DEFLATE_B85 = 0x02
+  const FMT_ENCRYPTED = 0x03
+  const FMT_BROTLI_B85 = 0x04
+  
+  const supportsBrotli = (() => {
+    try {
+      new CompressionStream('brotli')
+      return true
+    } catch { return false }
+  })()
+  
+  // ============================================
+  // COMPRESSION (with legacy support)
+  // ============================================
+  
+  async function compressBlocks(blocks) {
+    const binaryData = serializeBlocks(blocks)
+    const alg = supportsBrotli ? 'brotli' : 'deflate-raw'
+    const stream = new CompressionStream(alg)
+    const writer = stream.writable.getWriter()
+    writer.write(binaryData)
+    writer.close()
+    const buffer = await new Response(stream.readable).arrayBuffer()
+    const compressed = new Uint8Array(buffer)
+    
+    const fmt = supportsBrotli ? FMT_BROTLI_B85 : FMT_DEFLATE_B85
+    const withFmt = new Uint8Array(compressed.length + 1)
+    withFmt[0] = fmt
+    withFmt.set(compressed, 1)
+    return encodeBase85(withFmt)
+  }
+
+  async function decompressToBlocks(hashStr) {
+    if (!hashStr || typeof hashStr !== 'string' || hashStr.includes('undefined')) {
+      throw new Error('Invalid or corrupt hash')
+    }
+    let bytes
+    let fmt = FMT_DEFLATE_B64
+    
+    if (looksLikeBase85(hashStr)) {
+      const decoded = decodeBase85(hashStr)
+      fmt = decoded[0]
+      bytes = decoded.slice(1)
+    } else {
+      bytes = Uint8Array.fromBase64(hashStr, {alphabet: 'base64url'})
+    }
+    
+    if (fmt === FMT_ENCRYPTED) {
+      const err = new Error('Encrypted content')
+      err.type = 'ENCRYPTED'
+      err.encryptedData = bytes
+      throw err
+    }
+    
+    const alg = (fmt === FMT_BROTLI_B85) ? 'brotli' : 'deflate-raw'
+    const stream = new DecompressionStream(alg)
+    const writer = stream.writable.getWriter()
+    writer.write(bytes)
+    writer.close()
+    const buffer = await new Response(stream.readable).arrayBuffer()
+    const decoded = new Uint8Array(buffer)
+    
+    if (decoded[0] === BINARY_VERSION) {
+      return deserializeBlocks(decoded)
+    }
+    
+    const text = new TextDecoder().decode(decoded)
+    const [content, style] = text.split('\x00')
+    return parseTextToBlocks(content)
+  }
+  
+  // ============================================
+  // ENCRYPTION (AES-GCM, Web Crypto API)
+  // ============================================
+  
+  const PBKDF2_ITERATIONS = 120000
+  const SALT_LEN = 12
+  const IV_LEN = 12
+  const TAG_LEN = 16
+  
+  async function deriveKey(password, salt) {
+    const enc = new TextEncoder().encode(password)
+    const keyMaterial = await crypto.subtle.importKey('raw', enc, 'PBKDF2', false, ['deriveBits'])
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+      keyMaterial, 256)
+    return crypto.subtle.importKey('raw', bits, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt'])
+  }
+  
+  async function encryptBlocks(blocks, password) {
+    const plaintext = serializeBlocks(blocks)
+    const salt = crypto.getRandomValues(new Uint8Array(SALT_LEN))
+    const iv = crypto.getRandomValues(new Uint8Array(IV_LEN))
+    const key = await deriveKey(password, salt)
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv, tagLength: TAG_LEN * 8 }, key, plaintext)
+    const payload = new Uint8Array(SALT_LEN + IV_LEN + encrypted.byteLength)
+    payload.set(salt, 0)
+    payload.set(iv, SALT_LEN)
+    payload.set(new Uint8Array(encrypted), SALT_LEN + IV_LEN)
+    const withFmt = new Uint8Array(payload.length + 1)
+    withFmt[0] = FMT_ENCRYPTED
+    withFmt.set(payload, 1)
+    return encodeBase85(withFmt)
+  }
+  
+  async function decryptToBlocks(encBytes, password) {
+    if (!password) return null
+    const salt = encBytes.slice(0, SALT_LEN)
+    const iv = encBytes.slice(SALT_LEN, SALT_LEN + IV_LEN)
+    const ciphertext = encBytes.slice(SALT_LEN + IV_LEN)
+    const key = await deriveKey(password, salt)
+    try {
+      const plaintext = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv, tagLength: TAG_LEN * 8 }, key, ciphertext)
+      const bytes = new Uint8Array(plaintext)
+      if (bytes[0] === BINARY_VERSION) return deserializeBlocks(bytes)
+      const text = new TextDecoder().decode(bytes)
+      const [content] = text.split('\x00')
+      return parseTextToBlocks(content)
+    } catch {
+      return null
+    }
+  }
+
+  // Parse legacy text content into blocks (for backwards compatibility)
+  function parseTextToBlocks(text) {
+    if (!text || !text.trim()) {
+      return [createBlock('p', '')]
+    }
+    
+    const lines = text.split('\n')
+    const blocks = []
+    let i = 0
+    
+    while (i < lines.length) {
+      const line = lines[i]
+      
+      // Code block
+      if (line.startsWith('```') || line.startsWith('~~~')) {
+        const fence = line.slice(0, 3)
+        const lang = line.slice(3).trim()
+        const codeLines = []
+        i++
+        while (i < lines.length && !lines[i].startsWith(fence)) {
+          codeLines.push(lines[i])
+          i++
+        }
+        blocks.push(createBlock('code', codeLines.join('\n'), lang ? { lang } : {}))
+        i++
+        continue
+      }
+      
+      // Headings
+      const h6 = line.match(/^######\s+(.*)$/)
+      if (h6) { blocks.push(createBlock('h6', h6[1])); i++; continue }
+      const h5 = line.match(/^#####\s+(.*)$/)
+      if (h5) { blocks.push(createBlock('h5', h5[1])); i++; continue }
+      const h4 = line.match(/^####\s+(.*)$/)
+      if (h4) { blocks.push(createBlock('h4', h4[1])); i++; continue }
+      const h3 = line.match(/^###\s+(.*)$/)
+      if (h3) { blocks.push(createBlock('h3', h3[1])); i++; continue }
+      const h2 = line.match(/^##\s+(.*)$/)
+      if (h2) { blocks.push(createBlock('h2', h2[1])); i++; continue }
+      const h1 = line.match(/^#\s+(.*)$/)
+      if (h1) { blocks.push(createBlock('h1', h1[1])); i++; continue }
+      
+      // Todo
+      const todo = line.match(/^-\s*\[([ xX])\]\s*(.*)$/)
+      if (todo) {
+        const checked = todo[1].toLowerCase() === 'x'
+        blocks.push(createBlock('todo', todo[2], { checked }))
+        i++
+        continue
+      }
+      
+      // Bullet list
+      const bullet = line.match(/^[-*]\s+(.*)$/)
+      if (bullet) { blocks.push(createBlock('bullet', bullet[1])); i++; continue }
+      
+      // Numbered list
+      const number = line.match(/^(\d+)\.\s+(.*)$/)
+      if (number) {
+        blocks.push(createBlock('number', number[2], { start: parseInt(number[1]) }))
+        i++
+        continue
+      }
+      
+      // Quote
+      const quote = line.match(/^>\s*(.*)$/)
+      if (quote) { blocks.push(createBlock('quote', quote[1])); i++; continue }
+      
+      // Divider
+      if (line.match(/^---+$/) || line.match(/^\*\*\*+$/) || line.match(/^___+$/)) {
+        blocks.push(createBlock('divider', ''))
+        i++
+        continue
+      }
+      
+      // Regular paragraph
+      blocks.push(createBlock('p', line))
+      i++
+    }
+    
+    // Ensure at least one block
+    if (blocks.length === 0) {
+      blocks.push(createBlock('p', ''))
+    }
+    
+    return blocks
+  }
+
+  // Convert blocks back to markdown text for export
+  function blocksToMarkdown(blocks) {
+    return blocks.map(block => {
+      const text = getBlockText(block)
+      switch (block.t) {
+        case BLOCK_TYPES.H1: return `# ${text}`
+        case BLOCK_TYPES.H2: return `## ${text}`
+        case BLOCK_TYPES.H3: return `### ${text}`
+        case BLOCK_TYPES.H4: return `#### ${text}`
+        case BLOCK_TYPES.H5: return `##### ${text}`
+        case BLOCK_TYPES.H6: return `###### ${text}`
+        case BLOCK_TYPES.BULLET: return `- ${text}`
+        case BLOCK_TYPES.NUMBER: return `${block.p?.start || 1}. ${text}`
+        case BLOCK_TYPES.TODO: return `- [${block.p?.checked ? 'x' : ' '}] ${text}`
+        case BLOCK_TYPES.CODE: return `\`\`\`${block.p?.lang || ''}\n${text}\n\`\`\``
+        case BLOCK_TYPES.QUOTE: return `> ${text}`
+        case BLOCK_TYPES.DIVIDER: return '---'
+        case BLOCK_TYPES.CALLOUT: return `> ${block.p?.emoji || '💡'} ${text}`
+        default: return text
+      }
+    }).join('\n')
+  }
+
+  // Line-based diff for version compare (LCS-based, emits add/remove/unchanged)
+  function computeLineDiff(oldText, newText) {
+    const a = (oldText || '').split('\n')
+    const b = (newText || '').split('\n')
+    const result = []
+    const n = a.length
+    const m = b.length
+    const dp = Array(n + 1).fill(null).map(() => Array(m + 1).fill(0))
+    for (let i = 1; i <= n; i++) {
+      for (let j = 1; j <= m; j++) {
+        if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1
+        else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1])
+      }
+    }
+    const out = []
+    let i = n, j = m
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && a[i - 1] === b[j - 1]) {
+        out.push({ type: 'unchanged', line: a[i - 1] })
+        i--
+        j--
+      } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+        out.push({ type: 'add', line: b[j - 1] })
+        j--
+      } else {
+        out.push({ type: 'remove', line: a[i - 1] })
+        i--
+      }
+    }
+    return out.reverse()
+  }
+
+  // ============================================
+  // BLOCK RENDERING
+  // ============================================
+  
+  const container = document.getElementById('blocks-container')
+  
+  function renderBlock(block, index) {
+    const type = TYPE_LABELS[block.t] || 'p'
+    const text = getBlockText(block)
+    
+    const el = document.createElement('div')
+    el.className = 'block'
+    el.setAttribute('data-type', type)
+    el.setAttribute('data-index', index)
+    el.setAttribute('data-depth', getBlockDepth(block))
+    if (selectedBlockIndices.has(index)) el.classList.add('selected')
+    
+    // Drag handle
+    const handle = document.createElement('div')
+    handle.className = 'block-handle'
+    handle.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>'
+    handle.setAttribute('draggable', 'true')
+    handle.setAttribute('role', 'button')
+    handle.setAttribute('aria-label', 'Drag to reorder')
+    handle.setAttribute('tabindex', '0')
+    handle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        // Focus for keyboard drag (can be enhanced with keyboard drag-drop later)
+      }
+    })
+    el.appendChild(handle)
+    
+    // Special elements for certain block types
+    if (type === 'todo') {
+      const checkbox = document.createElement('div')
+      checkbox.className = 'todo-checkbox'
+      checkbox.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+      checkbox.setAttribute('role', 'checkbox')
+      checkbox.setAttribute('aria-checked', block.p?.checked ? 'true' : 'false')
+      checkbox.setAttribute('tabindex', '0')
+      checkbox.addEventListener('click', () => toggleTodo(index))
+      checkbox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          toggleTodo(index)
+        }
+      })
+      el.appendChild(checkbox)
+      if (block.p?.checked) {
+        el.setAttribute('data-checked', 'true')
+      }
+    }
+    
+    if (type === 'callout') {
+      const emoji = document.createElement('span')
+      emoji.className = 'callout-emoji'
+      emoji.textContent = block.p?.emoji || '💡'
+      el.appendChild(emoji)
+    }
+    
+    if (type === 'toggle') {
+      const icon = document.createElement('div')
+      icon.className = 'toggle-icon'
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l8 7-8 7z"/></svg>'
+      icon.setAttribute('role', 'button')
+      icon.setAttribute('aria-label', 'Toggle section')
+      icon.setAttribute('aria-expanded', block.p?.expanded ? 'true' : 'false')
+      icon.setAttribute('tabindex', '0')
+      icon.addEventListener('click', () => toggleExpand(index))
+      icon.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          toggleExpand(index)
+        }
+      })
+      el.appendChild(icon)
+      if (block.p?.expanded) {
+        el.setAttribute('data-expanded', 'true')
+      }
+    }
+    
+    if (type === 'number') {
+      el.setAttribute('data-number', block.p?.start || (index + 1))
+    }
+    
+    // Content area
+    const content = document.createElement('div')
+    content.className = 'block-content'
+    
+    if (type === 'divider') {
+      // Divider has no editable content
+      content.setAttribute('contenteditable', 'false')
+    } else {
+      content.setAttribute('contenteditable', (previewHash || encryptedContent) ? 'false' : 'true')
+      content.setAttribute('data-placeholder', getPlaceholder(type))
+      content.textContent = text
+      
+      // Apply inline formatting
+      if (type !== 'code') {
+        applyInlineFormatting(content)
+      }
+    }
+    
+    el.appendChild(content)
+    
+    // Event listeners
+    content.addEventListener('input', () => handleBlockInput(index, content))
+    content.addEventListener('keydown', e => handleBlockKeydown(e, index, content))
+    content.addEventListener('beforeinput', e => handleBeforeInput(e, index, content))
+    content.addEventListener('focus', () => focusedBlockIndex = index)
+    content.addEventListener('paste', e => handlePaste(e, index, content))
+    
+    return el
+  }
+
+  function getPlaceholder(type) {
+    const placeholders = {
+      p: "Type '/' for commands…",
+      h1: 'Heading 1',
+      h2: 'Heading 2',
+      h3: 'Heading 3',
+      h4: 'Heading 4',
+      h5: 'Heading 5',
+      h6: 'Heading 6',
+      bullet: 'List item',
+      number: 'List item',
+      todo: 'To-do',
+      code: 'Code',
+      quote: 'Quote',
+      callout: 'Callout',
+      toggle: 'Toggle'
+    }
+    return placeholders[type] || ''
+  }
+
+  function applyInlineFormatting(element) {
+    const text = element.textContent
+    if (!text) return
+    
+    // Simple inline formatting (bold, italic, code, links)
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+    
+    // Links
+    html = html.replace(/(https?:\/\/[^\s<>]+)/g, '<a href="$1" class="inline-link" target="_blank" rel="noopener">$1</a>')
+    
+    // Code (before bold/italic to avoid conflicts)
+    html = html.replace(/`([^`]+)`/g, '<span class="inline-code">$1</span>')
+    
+    // Bold
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<span class="inline-bold">$1</span>')
+    html = html.replace(/__([^_]+)__/g, '<span class="inline-bold">$1</span>')
+    
+    // Strikethrough
+    html = html.replace(/~~([^~]+)~~/g, '<span class="inline-strike">$1</span>')
+    
+    // Italic
+    html = html.replace(/\*([^*]+)\*/g, '<span class="inline-italic">$1</span>')
+    html = html.replace(/_([^_]+)_/g, '<span class="inline-italic">$1</span>')
+    
+    if (html !== element.innerHTML) {
+      // Save cursor position
+      const sel = window.getSelection()
+      const range = sel.rangeCount > 0 ? sel.getRangeAt(0) : null
+      const cursorOffset = range ? getCursorOffset(element, range) : 0
+      
+      element.innerHTML = html
+      
+      // Restore cursor
+      if (range && document.activeElement === element) {
+        setCursorOffset(element, cursorOffset)
+      }
+    }
+  }
+
+  function getCursorOffset(element, range) {
+    const preRange = document.createRange()
+    preRange.selectNodeContents(element)
+    preRange.setEnd(range.startContainer, range.startOffset)
+    return preRange.toString().length
+  }
+
+  function setCursorOffset(element, offset) {
+    const range = document.createRange()
+    const sel = window.getSelection()
+    
+    let charCount = 0
+    const nodeStack = [element]
+    let node, foundStart = false
+    
+    while (nodeStack.length > 0) {
+      node = nodeStack.pop()
+      
+      if (node.nodeType === Node.TEXT_NODE) {
+        const nextCharCount = charCount + node.length
+        if (!foundStart && offset <= nextCharCount) {
+          range.setStart(node, offset - charCount)
+          range.setEnd(node, offset - charCount)
+          foundStart = true
+          break
+        }
+        charCount = nextCharCount
+      } else {
+        const children = node.childNodes
+        for (let i = children.length - 1; i >= 0; i--) {
+          nodeStack.push(children[i])
+        }
+      }
+    }
+    
+    if (!foundStart) {
+      range.selectNodeContents(element)
+      range.collapse(false)
+    }
+    
+    sel.removeAllRanges()
+    sel.addRange(range)
+  }
+
+  function renderAllBlocks() {
+    container.innerHTML = ''
+    blocks.forEach((block, index) => {
+      container.appendChild(renderBlock(block, index))
+    })
+    updateStatusBar()
+  }
+
+  function focusBlock(index, atEnd = false) {
+    const blockEl = container.querySelector(`[data-index="${index}"]`)
+    if (!blockEl) return
+    
+    const content = blockEl.querySelector('.block-content')
+    if (!content || content.getAttribute('contenteditable') === 'false') return
+    
+    content.focus()
+    
+    if (atEnd && content.textContent) {
+      const range = document.createRange()
+      range.selectNodeContents(content)
+      range.collapse(false)
+      const sel = window.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  }
+
+  // ============================================
+  // BLOCK OPERATIONS
+  // ============================================
+  
+  function handleBlockInput(index, content) {
+    const text = content.textContent || ''
+    setBlockText(blocks[index], text)
+    
+    // Auto-format: check for markdown syntax at start of line
+    if (text.startsWith('# ') && blocks[index].t === BLOCK_TYPES.P) {
+      blocks[index].t = BLOCK_TYPES.H1
+      blocks[index].c = text.slice(2)
+      rerenderBlock(index)
+      return
+    }
+    if (text.startsWith('## ') && blocks[index].t === BLOCK_TYPES.P) {
+      blocks[index].t = BLOCK_TYPES.H2
+      blocks[index].c = text.slice(3)
+      rerenderBlock(index)
+      return
+    }
+    if (text.startsWith('### ') && blocks[index].t === BLOCK_TYPES.P) {
+      blocks[index].t = BLOCK_TYPES.H3
+      blocks[index].c = text.slice(4)
+      rerenderBlock(index)
+      return
+    }
+    if (text.startsWith('- ') && blocks[index].t === BLOCK_TYPES.P) {
+      blocks[index].t = BLOCK_TYPES.BULLET
+      blocks[index].c = text.slice(2)
+      rerenderBlock(index)
+      return
+    }
+    if (text.match(/^\d+\.\s/) && blocks[index].t === BLOCK_TYPES.P) {
+      const match = text.match(/^(\d+)\.\s(.*)$/)
+      if (match) {
+        blocks[index].t = BLOCK_TYPES.NUMBER
+        blocks[index].c = match[2]
+        blocks[index].p = { start: parseInt(match[1]) }
+        rerenderBlock(index)
+        return
+      }
+    }
+    if (text.startsWith('> ') && blocks[index].t === BLOCK_TYPES.P) {
+      blocks[index].t = BLOCK_TYPES.QUOTE
+      blocks[index].c = text.slice(2)
+      rerenderBlock(index)
+      return
+    }
+    if (text.startsWith('[] ') || text.startsWith('[ ] ')) {
+      blocks[index].t = BLOCK_TYPES.TODO
+      blocks[index].c = text.replace(/^\[\s?\]\s*/, '')
+      blocks[index].p = { checked: false }
+      rerenderBlock(index)
+      return
+    }
+    if (text === '---' || text === '***') {
+      blocks[index].t = BLOCK_TYPES.DIVIDER
+      blocks[index].c = ''
+      rerenderBlock(index)
+      insertBlockAfter(index, 'p')
+      return
+    }
+    
+    scheduleSave()
+    updateStatusBar()
+  }
+
+  function rerenderBlock(index) {
+    const oldEl = container.querySelector(`[data-index="${index}"]`)
+    if (!oldEl) return
+    
+    const newEl = renderBlock(blocks[index], index)
+    oldEl.replaceWith(newEl)
+    focusBlock(index, true)
+  }
+
+  function handleBeforeInput(e, index, content) {
+    if (!isAtInputLimit()) return
+    if (e.inputType === 'insertText' || e.inputType === 'insertCompositionText') {
+      e.preventDefault()
+      notify('Document at size limit — delete content to add more')
+    }
+  }
+
+  function handleBlockKeydown(e, index, content) {
+    const text = content.textContent || ''
+    const sel = window.getSelection()
+    const range = sel.rangeCount > 0 ? sel.getRangeAt(0) : null
+    const cursorAtStart = range && getCursorOffset(content, range) === 0
+    const cursorAtEnd = range && getCursorOffset(content, range) === text.length
+    
+    // Slash command
+    if (e.key === '/' && (text === '' || cursorAtEnd)) {
+      showSlashMenu(index, content)
+      return
+    }
+    
+    // Enter - create new block
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      
+      if (slashMenuVisible) {
+        selectSlashMenuItem()
+        return
+      }
+      
+      // Split block at cursor
+      const offset = range ? getCursorOffset(content, range) : text.length
+      const before = text.slice(0, offset)
+      const after = text.slice(offset)
+      
+      setBlockText(blocks[index], before)
+      content.textContent = before
+      
+      // Determine next block type
+      let nextType = 'p'
+      if (blocks[index].t === BLOCK_TYPES.BULLET) nextType = 'bullet'
+      else if (blocks[index].t === BLOCK_TYPES.NUMBER) nextType = 'number'
+      else if (blocks[index].t === BLOCK_TYPES.TODO) nextType = 'todo'
+      
+      // If current block is empty list item, convert to paragraph
+      if (before === '' && (nextType === 'bullet' || nextType === 'number' || nextType === 'todo')) {
+        blocks[index].t = BLOCK_TYPES.P
+        rerenderBlock(index)
+        return
+      }
+      
+      insertBlockAfter(index, nextType, after)
+      return
+    }
+    
+    // Backspace at start - merge with previous or change type
+    if (e.key === 'Backspace' && cursorAtStart && text === '') {
+      e.preventDefault()
+      
+      // If not paragraph, convert to paragraph first
+      if (blocks[index].t !== BLOCK_TYPES.P) {
+        blocks[index].t = BLOCK_TYPES.P
+        blocks[index].p = undefined
+        rerenderBlock(index)
+        return
+      }
+      
+      // Merge with previous block
+      if (index > 0) {
+        const prevText = getBlockText(blocks[index - 1])
+        setBlockText(blocks[index - 1], prevText + text)
+        blocks.splice(index, 1)
+        renderAllBlocks()
+        focusBlock(index - 1, true)
+      }
+      return
+    }
+    
+    // Backspace at start with content - merge with previous
+    if (e.key === 'Backspace' && cursorAtStart && index > 0) {
+      e.preventDefault()
+      const prevText = getBlockText(blocks[index - 1])
+      const cursorPos = prevText.length
+      setBlockText(blocks[index - 1], prevText + text)
+      blocks.splice(index, 1)
+      renderAllBlocks()
+      focusBlock(index - 1)
+      // Set cursor at merge point
+      const newContent = container.querySelector(`[data-index="${index - 1}"] .block-content`)
+      if (newContent) {
+        setCursorOffset(newContent, cursorPos)
+      }
+      return
+    }
+    
+    // Arrow up at start - move to previous block
+    if (e.key === 'ArrowUp' && cursorAtStart && index > 0) {
+      e.preventDefault()
+      focusBlock(index - 1, true)
+      return
+    }
+    
+    // Arrow down at end - move to next block
+    if (e.key === 'ArrowDown' && cursorAtEnd && index < blocks.length - 1) {
+      e.preventDefault()
+      focusBlock(index + 1)
+      return
+    }
+    
+    // Tab / Shift+Tab - indent / outdent (Notion-style)
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const depth = getBlockDepth(blocks[index])
+      if (e.shiftKey) {
+        if (depth > 0) {
+          setBlockDepth(blocks[index], depth - 1)
+          const el = container.querySelector(`[data-index="${index}"]`)
+          if (el) el.setAttribute('data-depth', depth - 1)
+          scheduleSave()
+        }
+      } else if (depth < MAX_INDENT) {
+        setBlockDepth(blocks[index], depth + 1)
+        const el = container.querySelector(`[data-index="${index}"]`)
+        if (el) el.setAttribute('data-depth', depth + 1)
+        scheduleSave()
+      }
+      return
+    }
+
+    // Block typing when at URL limit (allow Backspace, Delete, navigation)
+    if (isAtInputLimit()) {
+      const isContentIncrease = !['Backspace', 'Delete', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Escape'].includes(e.key)
+        && !(e.ctrlKey || e.metaKey)
+      if (isContentIncrease && e.key.length === 1) {
+        e.preventDefault()
+        notify('Document at size limit — delete content to add more')
+        return
+      }
+    }
+    
+    // Escape - close slash menu
+    if (e.key === 'Escape' && slashMenuVisible) {
+      hideSlashMenu()
+      return
+    }
+    
+    // Arrow navigation in slash menu
+    if (slashMenuVisible) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        navigateSlashMenu(1)
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        navigateSlashMenu(-1)
+        return
+      }
+    }
+  }
+
+  function handlePaste(e, index, content) {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    
+    const sel = window.getSelection()
+    if (sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0)
+      range.deleteContents()
+      range.insertNode(document.createTextNode(text))
+      range.collapse(false)
+    }
+    
+    setBlockText(blocks[index], content.textContent)
+    
+    if (isAtInputLimit()) {
+      let current = content.textContent
+      while (current.length > 0) {
+        setBlockText(blocks[index], current)
+        content.textContent = current
+        if (!isAtInputLimit()) break
+        current = current.slice(0, -1)
+      }
+      notify('Paste truncated — document at size limit')
+    }
+    
+    scheduleSave()
+    updateStatusBar()
+  }
+
+  function insertBlockAfter(index, type = 'p', content = '') {
+    const prevDepth = getBlockDepth(blocks[index] || createBlock('p'))
+    const newBlock = createBlock(type, content, { depth: prevDepth })
+    if (type === 'todo') {
+      newBlock.p = newBlock.p || {}
+      newBlock.p.checked = false
+    }
+    if (type === 'number') {
+      newBlock.p = newBlock.p || {}
+      const prevNum = blocks[index]?.p?.start || index + 1
+      newBlock.p.start = prevNum + 1
+    }
+    
+    blocks.splice(index + 1, 0, newBlock)
+    renderAllBlocks()
+    focusBlock(index + 1)
+    scheduleSave()
+  }
+
+  function deleteBlock(index) {
+    if (blocks.length <= 1) {
+      blocks[0] = createBlock('p', '')
+      renderAllBlocks()
+      focusBlock(0)
+    } else {
+      blocks.splice(index, 1)
+      renderAllBlocks()
+      focusBlock(Math.min(index, blocks.length - 1))
+    }
+    scheduleSave()
+  }
+
+  function toggleTodo(index) {
+    if (blocks[index].t !== BLOCK_TYPES.TODO) return
+    blocks[index].p = blocks[index].p || {}
+    blocks[index].p.checked = !blocks[index].p.checked
+    
+    const el = container.querySelector(`[data-index="${index}"]`)
+    if (el) {
+      el.setAttribute('data-checked', blocks[index].p.checked ? 'true' : 'false')
+      const checkbox = el.querySelector('.todo-checkbox')
+      if (checkbox) {
+        checkbox.setAttribute('aria-checked', blocks[index].p.checked ? 'true' : 'false')
+      }
+    }
+    scheduleSave()
+  }
+
+  function toggleExpand(index) {
+    if (blocks[index].t !== BLOCK_TYPES.TOGGLE) return
+    blocks[index].p = blocks[index].p || {}
+    blocks[index].p.expanded = !blocks[index].p.expanded
+    
+    const el = container.querySelector(`[data-index="${index}"]`)
+    if (el) {
+      el.setAttribute('data-expanded', blocks[index].p.expanded ? 'true' : 'false')
+      const icon = el.querySelector('.toggle-icon')
+      if (icon) {
+        icon.setAttribute('aria-expanded', blocks[index].p.expanded ? 'true' : 'false')
+      }
+    }
+  }
+
+  function changeBlockType(index, newType) {
+    const block = blocks[index]
+    const depth = getBlockDepth(block)
+    block.t = TYPE_NAMES[newType] ?? BLOCK_TYPES.P
+    
+    if (newType === 'todo') {
+      block.p = { depth, checked: false }
+    } else if (newType === 'callout') {
+      block.p = { depth, emoji: '💡' }
+    } else if (newType === 'toggle') {
+      block.p = { depth, expanded: false }
+    } else if (newType === 'divider') {
+      block.c = ''
+      block.p = depth > 0 ? { depth } : undefined
+    } else {
+      block.p = depth > 0 ? { depth } : undefined
+    }
+    
+    rerenderBlock(index)
+    scheduleSave()
+  }
+
+  // ============================================
+  // SLASH MENU
+  // ============================================
+  
+  const slashMenu = document.getElementById('slash-menu')
+  let slashMenuVisible = false
+  let slashMenuBlockIndex = -1
+  let slashMenuSelectedIndex = 0
+
+  function showSlashMenu(blockIndex, content) {
+    slashMenuBlockIndex = blockIndex
+    slashMenuVisible = true
+    slashMenuSelectedIndex = 0
+    
+    // Position menu below cursor
+    const rect = content.getBoundingClientRect()
+    slashMenu.style.top = (rect.bottom + 8) + 'px'
+    slashMenu.style.left = rect.left + 'px'
+    slashMenu.classList.add('visible')
+    
+    updateSlashMenuSelection()
+  }
+
+  function hideSlashMenu() {
+    slashMenuVisible = false
+    slashMenu.classList.remove('visible')
+    slashMenuBlockIndex = -1
+  }
+
+  function navigateSlashMenu(direction) {
+    const items = slashMenu.querySelectorAll('.slash-menu-item')
+    slashMenuSelectedIndex = (slashMenuSelectedIndex + direction + items.length) % items.length
+    updateSlashMenuSelection()
+  }
+
+  function updateSlashMenuSelection() {
+    const items = slashMenu.querySelectorAll('.slash-menu-item')
+    items.forEach((item, i) => {
+      item.classList.toggle('selected', i === slashMenuSelectedIndex)
+    })
+  }
+
+  function selectSlashMenuItem() {
+    const items = slashMenu.querySelectorAll('.slash-menu-item')
+    const selected = items[slashMenuSelectedIndex]
+    if (selected) {
+      const type = selected.getAttribute('data-type')
+      
+      // Clear the "/" from content
+      const content = container.querySelector(`[data-index="${slashMenuBlockIndex}"] .block-content`)
+      if (content) {
+        const text = content.textContent || ''
+        if (text.endsWith('/')) {
+          content.textContent = text.slice(0, -1)
+          setBlockText(blocks[slashMenuBlockIndex], text.slice(0, -1))
+        }
+      }
+      
+      changeBlockType(slashMenuBlockIndex, type)
+    }
+    hideSlashMenu()
+  }
+
+  // Slash menu click handlers
+  slashMenu.querySelectorAll('.slash-menu-item').forEach((item, index) => {
+    item.addEventListener('click', () => {
+      slashMenuSelectedIndex = index
+      selectSlashMenuItem()
+    })
+    item.addEventListener('mouseenter', () => {
+      slashMenuSelectedIndex = index
+      updateSlashMenuSelection()
+    })
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        slashMenuSelectedIndex = index
+        selectSlashMenuItem()
+      }
+    })
+  })
+
+  // Close slash menu when clicking outside
+  document.addEventListener('click', e => {
+    if (slashMenuVisible && !slashMenu.contains(e.target)) {
+      hideSlashMenu()
+    }
+  })
+
+  // ============================================
+  // MULTI-SELECT (Notion-style: Shift+click to select range)
+  // ============================================
+
+  function applySelectionToDOM() {
+    container.querySelectorAll('.block').forEach(el => {
+      const i = parseInt(el.getAttribute('data-index'), 10)
+      el.classList.toggle('selected', selectedBlockIndices.has(i))
+    })
+  }
+
+  container.addEventListener('mousedown', e => {
+    if (!e.target.closest('.block-handle')) return
+    const block = e.target.closest('.block')
+    if (!block) return
+    const index = parseInt(block.getAttribute('data-index'), 10)
+    if (Number.isNaN(index)) return
+    if (e.shiftKey) {
+      const from = lastClickedBlockIndex >= 0 ? lastClickedBlockIndex : index
+      const low = Math.min(from, index)
+      const high = Math.max(from, index)
+      for (let i = low; i <= high; i++) selectedBlockIndices.add(i)
+    } else {
+      selectedBlockIndices.clear()
+      selectedBlockIndices.add(index)
+    }
+    lastClickedBlockIndex = index
+    applySelectionToDOM()
+  })
+
+  // ============================================
+  // DRAG AND DROP (parent + children move together; drop shows indent level)
+  // ============================================
+  
+  let draggedBlockIndex = -1
+  let draggedIndices = []
+
+  container.addEventListener('dragstart', e => {
+    const handle = e.target.closest('.block-handle')
+    if (!handle) return
+    
+    const block = handle.closest('.block')
+    if (!block) return
+    
+    draggedBlockIndex = parseInt(block.getAttribute('data-index'), 10)
+    draggedIndices = getBlocksToMove(draggedBlockIndex, selectedBlockIndices)
+    draggedIndices.forEach(i => {
+      const el = container.querySelector(`[data-index="${i}"]`)
+      if (el) el.classList.add('dragging')
+    })
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', draggedIndices.join(','))
+  })
+
+  container.addEventListener('dragend', e => {
+    container.querySelectorAll('.block.dragging').forEach(el => el.classList.remove('dragging'))
+    draggedBlockIndex = -1
+    draggedIndices = []
+    container.querySelectorAll('.drop-indicator').forEach(el => el.remove())
+  })
+
+  container.addEventListener('dragover', e => {
+    e.preventDefault()
+    if (draggedIndices.length === 0) return
+    
+    const afterElement = getDragAfterElement(e.clientY)
+    const dropDepth = afterElement
+      ? getBlockDepth(blocks[parseInt(afterElement.getAttribute('data-index'), 10)])
+      : 0
+    let indicator = container.querySelector('.drop-indicator')
+    if (!indicator) indicator = createDropIndicator()
+    indicator.setAttribute('data-depth', String(dropDepth))
+    if (afterElement) {
+      afterElement.parentNode.insertBefore(indicator, afterElement)
+    } else {
+      container.appendChild(indicator)
+    }
+    indicator.classList.add('visible')
+  })
+
+  container.addEventListener('drop', e => {
+    e.preventDefault()
+    if (draggedIndices.length === 0) return
+    
+    const afterElement = getDragAfterElement(e.clientY)
+    const afterIndex = afterElement
+      ? parseInt(afterElement.getAttribute('data-index'), 10)
+      : blocks.length
+    
+    const movedBlocks = draggedIndices.map(i => blocks[i])
+    const sortedIndices = [...draggedIndices].sort((a, b) => a - b)
+    for (let i = sortedIndices.length - 1; i >= 0; i--) {
+      blocks.splice(sortedIndices[i], 1)
+    }
+    let insertIndex = afterIndex - sortedIndices.filter(i => i < afterIndex).length
+    insertIndex = Math.max(0, Math.min(insertIndex, blocks.length))
+    blocks.splice(insertIndex, 0, ...movedBlocks)
+    selectedBlockIndices.clear()
+    lastClickedBlockIndex = -1
+    
+    renderAllBlocks()
+    scheduleSave()
+  })
+
+  function getDragAfterElement(y) {
+    const draggableElements = [...container.querySelectorAll('.block:not(.dragging)')]
+    
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect()
+      const offset = y - box.top - box.height / 2
+      
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child }
+      } else {
+        return closest
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element
+  }
+
+  function createDropIndicator() {
+    const indicator = document.createElement('div')
+    indicator.className = 'drop-indicator'
+    indicator.setAttribute('data-depth', '0')
+    return indicator
+  }
+
+  // ============================================
+  // URL LIMIT ENFORCEMENT
+  // ============================================
+  
+  function getBaseUrlLength() {
+    return (location.origin + location.pathname + location.search + '#').length
+  }
+
+  function estimateUrlSizeFromBlocks(blocks) {
+    const serialized = serializeBlocks(blocks)
+    const baseLen = getBaseUrlLength()
+    const estimatedB64 = Math.ceil(serialized.length * 0.9 * 4 / 3)
+    return baseLen + estimatedB64
+  }
+
+  function isAtInputLimit() {
+    return estimateUrlSizeFromBlocks(blocks) >= URL_THRESHOLDS.danger
+  }
+
+  function applyLimitState() {
+    const atLimit = isAtInputLimit()
+    document.getElementById('status-bar')?.classList.toggle('at-limit', atLimit)
+    container.querySelectorAll('.block-content[contenteditable="true"]').forEach(el => {
+      el.classList.toggle('at-limit', atLimit)
+    })
+  }
+
+  // ============================================
+  // STATUS BAR
+  // ============================================
+  
+  const sizeProgress = document.getElementById('size-progress-fill')
+  const sizeText = document.getElementById('size-text')
+  const blockCount = document.getElementById('block-count')
+  const sizeWarning = document.getElementById('size-warning')
+  const sizeWarningText = document.getElementById('size-warning-text')
+  const sizeTooltip = document.getElementById('size-tooltip')
+  const sizeTooltipTitle = document.getElementById('size-tooltip-title')
+  const sizeTooltipTips = document.getElementById('size-tooltip-tips')
+
+  const sizeWarnings = {
+    warning: {
+      title: "Document is getting large",
+      tips: [
+        "Some URL shorteners may truncate this link",
+        "QR codes may become too dense to scan",
+        "Consider splitting into multiple documents"
+      ]
+    },
+    danger: {
+      title: "Document exceeds safe limits",
+      tips: [
+        "Older browsers may not handle this URL",
+        "Many web services will reject this link",
+        "Email clients may break the URL"
+      ]
+    },
+    critical: {
+      title: "Document too large to share reliably",
+      tips: [
+        "URL will likely fail in most contexts",
+        "Export as file instead (Share → Export)",
+        "Remove content or split into parts"
+      ]
+    }
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  function updateStatusBar() {
+    const url = location.href
+    const size = new Blob([url]).size
+    const percent = Math.min(100, (size / URL_THRESHOLDS.critical) * 100)
+    
+    // Update progress bar
+    sizeProgress.style.width = percent + '%'
+    
+    // Determine status
+    let status = 'safe'
+    if (size > URL_THRESHOLDS.critical) status = 'critical'
+    else if (size > URL_THRESHOLDS.danger) status = 'danger'
+    else if (size > URL_THRESHOLDS.warning) status = 'warning'
+    
+    sizeProgress.className = status
+    
+    // Update text
+    sizeText.textContent = formatBytes(size) + ' / ' + formatBytes(URL_THRESHOLDS.danger)
+    blockCount.textContent = blocks.length + ' block' + (blocks.length !== 1 ? 's' : '')
+    
+    // Show/hide warning
+    if (status !== 'safe') {
+      sizeWarning.classList.add('visible')
+      sizeWarningText.textContent = sizeWarnings[status].title
+    } else {
+      sizeWarning.classList.remove('visible')
+    }
+
+    applyLimitState()
+  }
+
+  // Tooltip interaction
+  document.getElementById('size-progress')?.addEventListener('click', () => {
+    const url = location.href
+    const size = new Blob([url]).size
+    
+    let status = 'warning'
+    if (size > URL_THRESHOLDS.critical) status = 'critical'
+    else if (size > URL_THRESHOLDS.danger) status = 'danger'
+    
+    if (size > URL_THRESHOLDS.warning) {
+      sizeTooltipTitle.textContent = sizeWarnings[status].title
+      sizeTooltipTips.innerHTML = sizeWarnings[status].tips
+        .map(tip => `<li>${tip}</li>`)
+        .join('')
+      sizeTooltip.classList.toggle('visible')
+    }
+  })
+
+  sizeWarning?.addEventListener('click', () => {
+    sizeTooltip.classList.toggle('visible')
+  })
+
+  document.addEventListener('click', e => {
+    if (!sizeTooltip.contains(e.target) && 
+        !sizeWarning?.contains(e.target) &&
+        e.target !== document.getElementById('size-progress')) {
+      sizeTooltip.classList.remove('visible')
+    }
+  })
+
+  // ============================================
+  // SAVE/LOAD FUNCTIONS
+  // ============================================
+  
+  let saveTimeout = null
+
+  function scheduleSave() {
+    if (saveTimeout) clearTimeout(saveTimeout)
+    saveTimeout = setTimeout(() => {
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => save(), { timeout: 2000 })
+      } else {
+        save()
+      }
+    }, 1200)
+  }
+
+  async function save() {
+    if (previewHash || encryptedContent) return
+    setSaveStatus('saving')
+    versionRedoStack = []
+    
+    const head = getHeadHash()
+    const prevHash = head || (getLocalVersions()[0]?.hash) || null
+    const hash = '#' + await compressBlocks(blocks)
+    
+    if (getHashFromUrl() !== hash.slice(1)) {
+      history.replaceState({}, '', buildUrl(hash))
+    }
+    
+    try {
+      pushLocalVersion(hash, prevHash ? [prevHash] : [])
+      localStorage.setItem('hash', hash)
+    } catch (e) {}
+    
+    setSaveStatus('saved')
+    setTimeout(() => setSaveStatus('idle'), 1500)
+    
+    updateTitle()
+    updateQR()
+    updateStatusBar()
+    
+    if (document.getElementById('history-dropdown')?.classList.contains('visible')) {
+      renderHistoryGraph()
+    }
+  }
+
+  async function load() {
+    if (previewHash) return
+    if (location.hash && location.hash.includes('undefined')) {
+      history.replaceState({}, '', buildUrl(''))
+      try { localStorage.removeItem('hash') } catch (_) {}
+    }
+
+    encryptedContent = null
+    document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
+    updateLockButtonVisibility()
+    updateUnlockBannerText()
+    
+    try {
+      const head = getHeadHash()
+      const hashRaw = getHashFromUrl()
+      if (hashRaw !== '') {
+        blocks = await decompressToBlocks(hashRaw)
+        try { localStorage.setItem('hash', hashRaw.startsWith('#') ? hashRaw : '#' + hashRaw) } catch (_) {}
+      } else if (head) {
+        blocks = await decompressToBlocks(head.slice(1))
+        if (blocks.length) history.replaceState({}, '', buildUrl(head))
+      } else {
+        blocks = [createBlock('p', '')]
+      }
+    } catch (e) {
+      if (e.type === 'ENCRYPTED' && e.encryptedData) {
+        encryptedContent = e.encryptedData
+        blocks = [createBlock('p', '')]
+        document.getElementById('editor-wrap')?.classList.add('encrypted-mode')
+        updateLockButtonVisibility()
+        updateUnlockBannerText()
+      } else {
+        console.error('Failed to load:', e)
+        blocks = [createBlock('p', '')]
+        const isCorrupt = e?.message?.includes('Invalid or corrupt') ||
+          e?.message?.includes('invalid distance') ||
+          e?.message?.includes('not valid') ||
+          (e?.name === 'TypeError' && e?.message?.includes('Failed to fetch'))
+        if (isCorrupt) {
+          history.replaceState({}, '', buildUrl(''))
+          try { localStorage.removeItem('hash') } catch (_) {}
+        }
+      }
+    }
+    
+    if (!blocks.length) blocks = [createBlock('p', '')]
+    
+    renderAllBlocks()
+    updateTitle()
+    updateQR()
+    updateStatusBar()
+    updateLockButtonVisibility()
+    
+    if (document.getElementById('history-dropdown')?.classList.contains('visible')) {
+      renderHistoryGraph()
+    }
+  }
+
+  async function setFromHash(hash) {
+    if (!hash) return
+    encryptedContent = null
+    document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
+    updateLockButtonVisibility()
+    updateUnlockBannerText()
+    try {
+      blocks = await decompressToBlocks(hash.slice(1))
+      if (!blocks.length) blocks = [createBlock('p', '')]
+    } catch (e) {
+      if (e.type === 'ENCRYPTED' && e.encryptedData) {
+        encryptedContent = e.encryptedData
+        blocks = [createBlock('p', '')]
+        document.getElementById('editor-wrap')?.classList.add('encrypted-mode')
+        updateLockButtonVisibility()
+        updateUnlockBannerText()
+      } else {
+        blocks = [createBlock('p', '')]
+      }
+    }
+    renderAllBlocks()
+    updateLockButtonVisibility()
+  }
+
+  function getHeadHash() {
+    try {
+      return localStorage.getItem('hash') || ''
+    } catch (e) {
+      return ''
+    }
+  }
+
+  function updateTitle() {
+    // Use first heading or first block content
+    for (const block of blocks) {
+      if (block.t >= BLOCK_TYPES.H1 && block.t <= BLOCK_TYPES.H6) {
+        const text = getBlockText(block).trim()
+        if (text) {
+          document.title = text
+          return
+        }
+      }
+    }
+    const firstText = getBlockText(blocks[0] || {}).trim()
+    document.title = firstText.slice(0, 50) || 'kheMessage'
+  }
+
+  function newNote() {
+    previewHash = null
+    encryptedContent = null
+    document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
+    const wrap = document.getElementById('editor-wrap')
+    if (wrap) wrap.classList.remove('preview-mode')
+    
+    blocks = [createBlock('p', '')]
+    renderAllBlocks()
+    
+    try {
+      localStorage.removeItem('hash')
+      clearVersionHistory()
+    } catch (e) {}
+    
+    history.replaceState({}, '', buildUrl(''))
+    updateTitle()
+    updateQR()
+    updateStatusBar()
+    updateLockButtonVisibility()
+    focusBlock(0)
+    
+    if (typeof renderHistoryGraph === 'function') renderHistoryGraph()
+  }
+
+  // ============================================
+  // THEME
+  // ============================================
+  
+  function getThemeFromUrl() {
+    const t = new URLSearchParams(location.search).get('theme')
+    return t === 'light' || t === 'dark' ? t : null
+  }
+
+  function buildUrl(hash) {
+    const path = location.pathname || ''
+    const search = theme ? '?theme=' + theme : (location.search || '')
+    const h = hash !== undefined ? hash : location.hash
+    let raw = (h && typeof h === 'string' && h.startsWith('#')) ? h.slice(1) : (h || '')
+    if (typeof raw !== 'string' || raw.includes('undefined')) raw = ''
+    return path + search + (raw ? '#' + encodeURIComponent(raw) : '')
+  }
+  
+  function getHashFromUrl() {
+    const raw = location.hash.slice(1)
+    if (!raw) return ''
+    if (raw.includes('undefined')) return ''
+    try {
+      return decodeURIComponent(raw)
+    } catch {
+      return raw
+    }
+  }
+
+  function applyTheme(t) {
+    document.documentElement.classList.remove('light', 'dark')
+    if (t) document.documentElement.classList.add(t)
+    const meta = document.getElementById('theme-color-meta')
+    if (meta) meta.content = t === 'dark' ? '#1c1917' : '#fafaf9'
+  }
+
+  function setTheme(t) {
+    theme = t
+    applyTheme(t)
+    history.replaceState({}, '', buildUrl())
+  }
+
+  function initTheme() {
+    theme = getThemeFromUrl()
+    if (!theme) {
+      theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      history.replaceState({}, '', buildUrl())
+    }
+    applyTheme(theme)
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      setTheme(theme === 'dark' ? 'light' : 'dark')
+    })
+  }
+
+  // ============================================
+  // VERSION HISTORY
+  // ============================================
+  
+  function getLocalVersionsList() {
+    try {
+      const raw = localStorage.getItem(VERSION_KEY)
+      if (!raw) return []
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return []
+      return parsed.filter(v => v && typeof v.hash === 'string' && typeof v.t === 'number').map(v => {
+        const parents = v.parents !== undefined
+          ? (Array.isArray(v.parents) ? v.parents.filter(Boolean) : [])
+          : (v.parent ? [v.parent] : [])
+        return { hash: v.hash, t: v.t, parents }
+      })
+    } catch (e) {
+      return []
+    }
+  }
+
+  function getLocalVersions() {
+    const list = getLocalVersionsList()
+    const byHash = new Map()
+    for (const v of list) {
+      if (!byHash.has(v.hash)) {
+        byHash.set(v.hash, { hash: v.hash, t: v.t, parents: v.parents || [] })
+      } else {
+        const cur = byHash.get(v.hash)
+        if (v.parents && v.parents.length > 1) cur.parents = v.parents
+        if (v.t > cur.t) cur.t = v.t
+      }
+    }
+    return Array.from(byHash.values())
+  }
+
+  function pushLocalVersion(hash, parentOrParents) {
+    if (!hash || typeof hash !== 'string') return
+    const parents = Array.isArray(parentOrParents)
+      ? parentOrParents.filter(Boolean)
+      : (parentOrParents ? [parentOrParents] : [])
+    let list
+    try {
+      list = getLocalVersionsList()
+      const idx = list.findIndex(v => v.hash === hash)
+      const head = getHeadHash()
+      if (idx >= 0) {
+        list[idx].t = Date.now()
+        list[idx].parents = parents
+        const el = list.splice(idx, 1)[0]
+        list.unshift(el)
+      } else {
+        list.unshift({ hash, t: Date.now(), parents })
+      }
+      while (list.length > MAX_VERSIONS) {
+        const last = list[list.length - 1]
+        if (last.hash === head) break
+        list.pop()
+      }
+      localStorage.setItem(VERSION_KEY, JSON.stringify(list))
+    } catch (e) {
+      if (e && e.name === 'QuotaExceededError' && list && list.length > 1) {
+        try {
+          const head = getHeadHash()
+          list = list.filter((_, i) => i < Math.floor(list.length / 2) || list[i].hash === head)
+          localStorage.setItem(VERSION_KEY, JSON.stringify(list))
+        } catch (_) {}
+      }
+    }
+  }
+
+  function getParentOf(hash) {
+    const list = getLocalVersions()
+    const entry = list.find(v => v.hash === hash)
+    return (entry && entry.parents && entry.parents[0]) ? entry.parents[0] : null
+  }
+
+  function getParentsOf(hash) {
+    const list = getLocalVersions()
+    const entry = list.find(v => v.hash === hash)
+    return entry && Array.isArray(entry.parents) ? entry.parents : []
+  }
+
+  function getVersionByHash(hash) {
+    const list = getLocalVersions()
+    return list.find(v => v.hash === hash)
+  }
+
+  function formatVersionLabel(hash) {
+    const v = getVersionByHash(hash)
+    if (v?.t) {
+      const d = new Date(v.t)
+      const now = new Date()
+      const diff = now - d
+      if (diff < 60000) return 'just now'
+      if (diff < 3600000) return Math.floor(diff / 60000) + ' min ago'
+      if (diff < 86400000) return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+      return d.toLocaleDateString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+    }
+    return 'earlier version'
+  }
+
+  function clearVersionHistory() {
+    try {
+      const head = getHeadHash()
+      if (head) {
+        localStorage.setItem(VERSION_KEY, JSON.stringify([{ hash: head, t: Date.now(), parents: [] }]))
+      } else {
+        localStorage.removeItem(VERSION_KEY)
+      }
+    } catch (e) {}
+  }
+
+  function buildVersionGraph() {
+    const list = getLocalVersions()
+    const nodes = list.map(v => ({
+      hash: v.hash,
+      t: v.t,
+      parents: v.parents || [],
+      merge: (v.parents && v.parents.length > 1)
+    }))
+    const edges = []
+    for (const n of nodes) {
+      for (const p of (n.parents || [])) {
+        if (p) edges.push({ from: p, to: n.hash })
+      }
+    }
+    const byHash = new Map(nodes.map(n => [n.hash, n]))
+    const sorted = [...nodes].sort((a, b) => a.t - b.t)
+    const parentOf = new Map()
+    for (const e of edges) parentOf.set(e.to, e.from)
+    const children = new Map()
+    for (const e of edges) {
+      if (!children.has(e.from)) children.set(e.from, [])
+      children.get(e.from).push(e.to)
+    }
+    let branchRow = 0
+    const rowByHash = new Map()
+    const colByHash = new Map()
+    sorted.forEach((n, col) => colByHash.set(n.hash, col))
+    for (const n of sorted) {
+      const parents = n.parents || []
+      const firstParent = parents[0]
+      const siblings = firstParent ? (children.get(firstParent) || []).sort((a, b) => (colByHash.get(a) ?? 0) - (colByHash.get(b) ?? 0)) : [n.hash]
+      const idx = siblings.indexOf(n.hash)
+      if (firstParent && idx === 0) {
+        rowByHash.set(n.hash, rowByHash.get(firstParent) ?? 0)
+      } else {
+        rowByHash.set(n.hash, branchRow++)
+      }
+    }
+    const colW = 22
+    const rowH = 18
+    for (const n of nodes) {
+      n.vx = (colByHash.get(n.hash) ?? 0) * colW
+      n.vy = (rowByHash.get(n.hash) ?? 0) * rowH
+    }
+    return { nodes, edges, byHash }
+  }
+
+  function renderHistoryGraphVertical() {
+    const container = document.getElementById('history-graph-vertical')
+    if (!container) return
+    const { nodes } = buildVersionGraph()
+    const ordered = [...nodes].sort((a, b) => b.t - a.t)
+    const head = getHeadHash()
+    container.innerHTML = ''
+    if (ordered.length === 0) {
+      container.innerHTML = '<div class="history-empty">No version history</div>'
+      return
+    }
+    for (const n of ordered) {
+      const row = document.createElement('div')
+      row.className = 'version-row' + (n.hash === head ? ' current' : '') + (n.hash === previewHash ? ' previewing' : '') + (n.merge ? ' is-merge' : '')
+      row.setAttribute('data-hash', n.hash)
+      row.setAttribute('role', 'menuitem')
+      row.setAttribute('tabindex', '0')
+      const dot = document.createElement('span')
+      dot.className = 'version-dot'
+      const meta = document.createElement('span')
+      meta.className = 'version-meta'
+      const idSpan = document.createElement('span')
+      idSpan.className = 'version-id'
+      idSpan.textContent = n.hash.slice(1, 12) + (n.hash.length > 12 ? '…' : '')
+      meta.appendChild(idSpan)
+      if (n.merge) {
+        const mergeBadge = document.createElement('span')
+        mergeBadge.className = 'version-merge-badge'
+        mergeBadge.textContent = 'Merge'
+        meta.appendChild(mergeBadge)
+      }
+      const dateSpan = document.createElement('span')
+      dateSpan.className = 'version-date'
+      dateSpan.textContent = new Date(n.t).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+      meta.appendChild(dateSpan)
+      const actions = document.createElement('span')
+      actions.className = 'version-actions'
+      const compareBtn = document.createElement('button')
+      compareBtn.type = 'button'
+      compareBtn.className = 'version-action-btn'
+      compareBtn.setAttribute('aria-label', 'Compare with current')
+      compareBtn.title = 'Compare with current'
+      compareBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M8 3H3v5M12 8v8M9 12h6"/></svg>'
+      compareBtn.addEventListener('click', (e) => { e.stopPropagation(); openDiffModal(head, n.hash) })
+      const mergeBtn = document.createElement('button')
+      mergeBtn.type = 'button'
+      mergeBtn.className = 'version-action-btn'
+      mergeBtn.setAttribute('aria-label', 'Merge into current')
+      mergeBtn.title = 'Merge into current'
+      mergeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3h8v8H8zM8 13h8v8H8zM3 8h5v5H3zM16 8h5v5h-5z"/></svg>'
+      mergeBtn.addEventListener('click', (e) => { e.stopPropagation(); mergeVersionIntoCurrent(n.hash) })
+      if (n.hash !== head) {
+        actions.appendChild(compareBtn)
+        actions.appendChild(mergeBtn)
+      }
+      row.appendChild(dot)
+      row.appendChild(meta)
+      row.appendChild(actions)
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.version-actions')) return
+        if (n.hash === previewHash) { exitPreview(); return }
+        if (n.hash === head) { exitPreview(); return }
+        enterPreview(n.hash)
+      })
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          if (n.hash === previewHash) { exitPreview(); return }
+          if (n.hash === head) { exitPreview(); return }
+          enterPreview(n.hash)
+        }
+      })
+      container.appendChild(row)
+    }
+  }
+
+  function renderHistoryGraphSvg() {
+    const svg = document.getElementById('history-graph')
+    const graphContainer = document.getElementById('history-graph-container')
+    if (!svg || !graphContainer) return
+    
+    const { nodes, edges, byHash } = buildVersionGraph()
+    const head = getHeadHash()
+    
+    if (nodes.length === 0) {
+      svg.innerHTML = ''
+      svg.setAttribute('viewBox', '0 0 100 40')
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+      text.setAttribute('x', '50')
+      text.setAttribute('y', '24')
+      text.setAttribute('text-anchor', 'middle')
+      text.setAttribute('fill', 'var(--text-muted)')
+      text.setAttribute('font-size', '12')
+      text.textContent = 'No version history'
+      svg.appendChild(text)
+      return
+    }
+    
+    const padding = 12
+    const r = 4
+    const w = Math.max(180, (nodes.length ? Math.max(...nodes.map(n => n.vx)) : 0) + padding * 2)
+    const h = Math.max(50, (nodes.length ? Math.max(...nodes.map(n => n.vy)) : 0) + padding * 2)
+    
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`)
+    svg.setAttribute('width', '100%')
+    svg.setAttribute('height', String(h))
+    svg.innerHTML = ''
+    
+    const gEdges = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+    gEdges.setAttribute('stroke', 'var(--border)')
+    gEdges.setAttribute('stroke-width', '1')
+    gEdges.setAttribute('fill', 'none')
+    
+    for (const e of edges) {
+      const a = byHash.get(e.from)
+      const b = byHash.get(e.to)
+      if (!a || !b) continue
+      const x1 = a.vx + padding
+      const y1 = a.vy + padding
+      const x2 = b.vx + padding
+      const y2 = b.vy + padding
+      const cpx = (x1 + x2) / 2
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+      path.setAttribute('d', `M ${x1} ${y1} Q ${cpx} ${y1} ${cpx} ${(y1 + y2) / 2} Q ${cpx} ${y2} ${x2} ${y2}`)
+      gEdges.appendChild(path)
+    }
+    svg.appendChild(gEdges)
+    
+    const gNodes = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+    for (const n of nodes) {
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+      circle.setAttribute('cx', n.vx + padding)
+      circle.setAttribute('cy', n.vy + padding)
+      circle.setAttribute('r', r)
+      circle.setAttribute('fill', 'var(--text-muted)')
+      circle.classList.add('node')
+      if (n.merge) circle.classList.add('merge')
+      if (n.hash === head) circle.classList.add('current')
+      if (n.hash === previewHash) circle.classList.add('previewing')
+      circle.setAttribute('data-hash', n.hash)
+      gNodes.appendChild(circle)
+    }
+    svg.appendChild(gNodes)
+    
+    svg.querySelectorAll('.node').forEach(el => {
+      el.setAttribute('role', 'button')
+      el.setAttribute('tabindex', '0')
+      el.addEventListener('click', e => {
+        e.stopPropagation()
+        const hash = el.getAttribute('data-hash')
+        if (!hash) return
+        if (hash === previewHash) { exitPreview(); return }
+        if (hash === getHeadHash()) { exitPreview(); return }
+        enterPreview(hash)
+      })
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
+          const hash = el.getAttribute('data-hash')
+          if (!hash) return
+          if (hash === previewHash) { exitPreview(); return }
+          if (hash === getHeadHash()) { exitPreview(); return }
+          enterPreview(hash)
+        }
+      })
+    })
+  }
+
+  function renderHistoryGraph() {
+    renderHistoryGraphSvg()
+    renderHistoryGraphVertical()
+  }
+
+  async function openDiffModal(baseHash, compareHash) {
+    const overlay = document.getElementById('diff-modal-overlay')
+    const content = document.getElementById('diff-content')
+    const baseLabel = document.getElementById('diff-base-label')
+    const compareLabel = document.getElementById('diff-compare-label')
+    if (!overlay || !content) return
+    const head = getHeadHash()
+    baseLabel.textContent = baseHash === head ? 'Current' : formatVersionLabel(baseHash)
+    compareLabel.textContent = compareHash === head ? 'Current' : formatVersionLabel(compareHash)
+    content.textContent = 'Loading…'
+    overlay.classList.add('visible')
+    overlay.setAttribute('aria-hidden', 'false')
+    try {
+      let baseBlocks = [], compareBlocks = []
+      if (baseHash) {
+        try { baseBlocks = await decompressToBlocks(baseHash.slice(1)) } catch (_) {}
+      }
+      if (compareHash) {
+        try { compareBlocks = await decompressToBlocks(compareHash.slice(1)) } catch (_) {}
+      }
+      const baseMd = blocksToMarkdown(baseBlocks)
+      const compareMd = blocksToMarkdown(compareBlocks)
+      const diff = computeLineDiff(baseMd, compareMd)
+      content.innerHTML = ''
+      if (diff.length === 0) {
+        content.innerHTML = '<div class="diff-line diff-line-unchanged">No differences</div>'
+      } else {
+        for (const d of diff) {
+          const div = document.createElement('div')
+          div.className = 'diff-line diff-line-' + d.type
+          const prefix = d.type === 'add' ? '+ ' : d.type === 'remove' ? '− ' : '  '
+          div.textContent = prefix + (d.line || '')
+          content.appendChild(div)
+        }
+      }
+    } catch (e) {
+      content.textContent = 'Could not load versions.'
+    }
+  }
+
+  function closeDiffModal() {
+    const overlay = document.getElementById('diff-modal-overlay')
+    if (overlay) {
+      overlay.classList.remove('visible')
+      overlay.setAttribute('aria-hidden', 'true')
+    }
+  }
+
+  async function mergeVersionIntoCurrent(sourceHash) {
+    if (!sourceHash) return
+    const source = sourceHash.startsWith('#') ? sourceHash : '#' + sourceHash
+    const head = getHeadHash()
+    if (source === head) {
+      notify('This is already the current version')
+      return
+    }
+    if (!confirm('Append all content from this version to the end of your current note? A divider will be inserted between them.')) return
+    try {
+      const sourceBlocks = await decompressToBlocks(source.slice(1))
+      if (!sourceBlocks.length) {
+        notify('That version has no content to merge')
+        return
+      }
+      const headBlocks = head ? await decompressToBlocks(head.slice(1)) : []
+      let mergedBlocks
+      if (!headBlocks.length) {
+        mergedBlocks = [...sourceBlocks]
+      } else {
+        const divider = createBlock('divider')
+        mergedBlocks = [...headBlocks, divider, ...sourceBlocks]
+      }
+      const mergedHash = '#' + await compressBlocks(mergedBlocks)
+      pushLocalVersion(mergedHash, [head, source].filter(Boolean))
+      try { localStorage.setItem('hash', mergedHash) } catch (e) {}
+      history.replaceState({}, '', buildUrl(mergedHash))
+      versionRedoStack = []
+      blocks = mergedBlocks
+      renderAllBlocks()
+      if (previewHash) exitPreview()
+      updateTitle()
+      updateQR()
+      updateStatusBar()
+      renderHistoryGraph()
+      notify('Merged version into current')
+    } catch (e) {
+      notify('Could not merge version')
+    }
+  }
+
+  async function enterPreview(hash) {
+    if (!hash) return
+    if (!hash.startsWith('#')) hash = '#' + hash
+    
+    const head = getHeadHash()
+    if (hash === head) {
+      exitPreview()
+      return
+    }
+    
+    const wrap = document.getElementById('editor-wrap')
+    const banner = document.getElementById('preview-banner')
+    const text = document.getElementById('preview-banner-text')
+    
+    try {
+      await setFromHash(hash)
+    } catch (e) {
+      notify('Could not load version')
+      return
+    }
+    
+    previewHash = hash
+    
+    if (encryptedContent) {
+      updateUnlockBannerText()
+      return
+    }
+    
+    // Disable editing
+    container.querySelectorAll('.block-content').forEach(el => {
+      el.setAttribute('contenteditable', 'false')
+    })
+    
+    if (wrap) wrap.classList.add('preview-mode')
+    if (text) text.textContent = 'Previewing ' + formatVersionLabel(hash)
+    
+    updateTitle()
+    updateQR()
+    renderHistoryGraph()
+  }
+
+  async function exitPreview() {
+    const head = getHeadHash()
+    if (head) {
+      await setFromHash(head)
+    } else {
+      blocks = [createBlock('p', '')]
+      renderAllBlocks()
+    }
+    
+    history.replaceState({}, '', buildUrl(head || ''))
+    previewHash = null
+    
+    const wrap = document.getElementById('editor-wrap')
+    if (wrap) wrap.classList.remove('preview-mode')
+    
+    // Enable editing
+    container.querySelectorAll('.block-content').forEach(el => {
+      if (el.closest('[data-type="divider"]')) return
+      el.setAttribute('contenteditable', 'true')
+    })
+    
+    updateTitle()
+    updateQR()
+    renderHistoryGraph()
+  }
+
+  async function restorePreviewVersion() {
+    if (!previewHash) return
+    if (!confirm('Replace current version with this one? This cannot be undone.')) return
+    const hash = previewHash
+    try {
+      localStorage.setItem('hash', hash)
+      history.replaceState({}, '', buildUrl(hash))
+    } catch (e) {}
+    exitPreview()
+  }
+
+  async function versionUndo() {
+    const head = getHeadHash()
+    if (!head) return false
+    const parent = getParentOf(head)
+    if (!parent) return false
+    
+    versionRedoStack.push(head)
+    previewHash = null
+    
+    const wrap = document.getElementById('editor-wrap')
+    if (wrap) wrap.classList.remove('preview-mode')
+    
+    await setFromHash(parent)
+    try { localStorage.setItem('hash', parent) } catch (e) {}
+    history.replaceState({}, '', buildUrl(parent))
+    
+    updateTitle()
+    updateQR()
+    renderHistoryGraph()
+    return true
+  }
+
+  async function versionRedo() {
+    if (versionRedoStack.length === 0) return false
+    const next = versionRedoStack.pop()
+    previewHash = null
+    
+    const wrap = document.getElementById('editor-wrap')
+    if (wrap) wrap.classList.remove('preview-mode')
+    
+    await setFromHash(next)
+    try { localStorage.setItem('hash', next) } catch (e) {}
+    history.replaceState({}, '', buildUrl(next))
+    
+    updateTitle()
+    updateQR()
+    renderHistoryGraph()
+    return true
+  }
+
+  async function resetToHead() {
+    if (previewHash) await exitPreview()
+    let head = getHeadHash()
+    if (!head && blocks.length && getBlockText(blocks[0]).trim()) {
+      await save()
+      head = getHeadHash()
+    }
+    if (head) {
+      await setFromHash(head)
+      history.replaceState({}, '', buildUrl(head))
+    }
+    clearVersionHistory()
+    updateTitle()
+    updateQR()
+    renderHistoryGraph()
+  }
+
+  // ============================================
+  // UI HELPERS
+  // ============================================
+  
+  function setSaveStatus(status) {
+    const btn = document.getElementById('save-btn')
+    const text = document.getElementById('save-btn-text')
+    if (!btn || !text) return
+    btn.classList.remove('saved')
+    if (status === 'saving') {
+      text.textContent = 'Saving…'
+      btn.disabled = true
+    } else if (status === 'saved') {
+      text.textContent = 'Saved'
+      btn.classList.add('saved')
+      btn.disabled = false
+    } else {
+      text.textContent = 'Save'
+      btn.disabled = false
+    }
+  }
+
+  function notify(message) {
+    const notification = document.querySelector('#notification')
+    if (!notification) return
+    notification.classList.add('visible')
+    notification.textContent = message
+    setTimeout(() => notification.classList.remove('visible'), 2000)
+  }
+
+  function debounce(ms, fn) {
+    let timer
+    return (...args) => {
+      clearTimeout(timer)
+      timer = setTimeout(() => fn(...args), ms)
+    }
+  }
+
+  function updateLockButtonVisibility() {
+    const lockBtn = document.getElementById('lock-btn')
+    if (!lockBtn) return
+    lockBtn.classList.toggle('is-locked', !!encryptedContent)
+    lockBtn.setAttribute('aria-label', encryptedContent ? 'Note is locked. Unlock via the banner above.' : 'Lock note with password')
+    lockBtn.title = encryptedContent ? 'Note is locked. Unlock via the banner above.' : 'Lock note with password'
+  }
+
+  function updateUnlockBannerText() {
+    const text = document.getElementById('unlock-banner-text')
+    if (!text) return
+    text.textContent = previewHash
+      ? 'This version is encrypted. Enter the password to view it.'
+      : 'This note is encrypted. Enter the password to unlock.'
+  }
+
+  function updateQR() {
+    const el = document.getElementById('qrcode')
+    if (!el || typeof qrcode !== 'function') return
+    const url = location.href
+    try {
+      const qr = qrcode(0, 'L')
+      qr.addData(url)
+      qr.make()
+      el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 })
+    } catch (e) {
+      el.innerHTML = ''
+    }
+  }
+
+  // ============================================
+  // EXPORT FUNCTIONS
+  // ============================================
+  
+  async function downloadHTML() {
+    updateTitle()
+    const doc = document.documentElement.cloneNode(true)
+    doc.querySelectorAll('script').forEach(s => s.remove())
+    doc.querySelectorAll('.noprint').forEach(s => s.remove())
+    doc.querySelector('#blocks-container')?.querySelectorAll('[contenteditable]').forEach(el => {
+      el.removeAttribute('contenteditable')
+    })
+    const html = '<!DOCTYPE html>\n' + doc.outerHTML
+
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await showSaveFilePicker({
+          suggestedName: document.title + '.html',
+          types: [{ description: 'HTML file', accept: {'text/html': ['.html']} }],
+        })
+        const writable = await handle.createWritable()
+        await writable.write(html)
+        await writable.close()
+        return
+      } catch (e) {
+        if (e.name === 'AbortError') return
+      }
+    }
+
+    const blob = new Blob([html], {type: 'text/html'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = document.title + '.html'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function downloadTXT() {
+    updateTitle()
+    const text = blocksToMarkdown(blocks)
+
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await showSaveFilePicker({
+          suggestedName: document.title + '.txt',
+          types: [{ description: 'TEXT file', accept: {'text/plain': ['.txt']} }],
+        })
+        const writable = await handle.createWritable()
+        await writable.write(text)
+        await writable.close()
+        return
+      } catch (e) {
+        if (e.name === 'AbortError') return
+      }
+    }
+
+    const blob = new Blob([text], {type: 'text/plain'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = document.title + '.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function downloadMD() {
+    updateTitle()
+    const text = blocksToMarkdown(blocks)
+
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await showSaveFilePicker({
+          suggestedName: document.title + '.md',
+          types: [{ description: 'Markdown file', accept: {'text/markdown': ['.md']} }],
+        })
+        const writable = await handle.createWritable()
+        await writable.write(text)
+        await writable.close()
+        return
+      } catch (e) {
+        if (e.name === 'AbortError') return
+      }
+    }
+
+    const blob = new Blob([text], {type: 'text/markdown'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = document.title + '.md'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function importFile() {
+    let file
+    if ('showOpenFilePicker' in window) {
+      try {
+        const [handle] = await showOpenFilePicker({
+          types: [{
+            description: 'Text / Markdown / HTML',
+            accept: {
+              'text/plain': ['.txt'],
+              'text/markdown': ['.md', '.markdown'],
+              'text/html': ['.html', '.htm'],
+            },
+          }],
+          multiple: false,
+        })
+        file = await handle.getFile()
+      } catch (e) {
+        if (e.name === 'AbortError') return
+        throw e
+      }
+    } else {
+      file = await new Promise((resolve) => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = '.txt,.md,.markdown,.html,.htm'
+        input.onchange = () => resolve(input.files?.[0] ?? null)
+        input.oncancel = () => resolve(null)
+        input.click()
+      })
+      if (!file) return
+    }
+    
+    const type = (file.name || '').toLowerCase()
+    let text = await file.text()
+    
+    if (type.endsWith('.html') || type.endsWith('.htm')) {
+      const doc = new DOMParser().parseFromString(text, 'text/html')
+      text = doc.body ? doc.body.innerText : text
+    }
+    
+    blocks = parseTextToBlocks(text)
+    renderAllBlocks()
+    await save()
+  }
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  
+  function initUI() {
+    updateQR()
+
+    document.getElementById('preview-restore')?.addEventListener('click', e => {
+      e.preventDefault()
+      restorePreviewVersion()
+      notify('Restored this version')
+    })
+    
+    document.getElementById('preview-back')?.addEventListener('click', () => {
+      exitPreview()
+      notify('Back to current')
+    })
+    document.getElementById('preview-compare')?.addEventListener('click', () => {
+      if (previewHash) openDiffModal(getHeadHash(), previewHash)
+    })
+    document.getElementById('preview-merge')?.addEventListener('click', () => {
+      if (previewHash) mergeVersionIntoCurrent(previewHash)
+    })
+
+    const historyBtn = document.getElementById('history-btn')
+    const historyDropdown = document.getElementById('history-dropdown')
+    const shareBtn = document.getElementById('share-btn')
+    const shareDropdown = document.getElementById('share-dropdown')
+
+    function closeAllDropdowns() {
+      historyDropdown?.classList.remove('visible')
+      shareDropdown?.classList.remove('visible')
+      historyBtn?.setAttribute('aria-expanded', 'false')
+      shareBtn?.setAttribute('aria-expanded', 'false')
+    }
+
+    historyBtn?.addEventListener('click', e => {
+      e.stopPropagation()
+      const open = historyDropdown?.classList.toggle('visible')
+      historyBtn?.setAttribute('aria-expanded', open ? 'true' : 'false')
+      if (open) {
+        shareDropdown?.classList.remove('visible')
+        shareBtn?.setAttribute('aria-expanded', 'false')
+        renderHistoryGraph()
+      }
+    })
+
+    shareBtn?.addEventListener('click', e => {
+      e.stopPropagation()
+      const open = shareDropdown?.classList.toggle('visible')
+      shareBtn?.setAttribute('aria-expanded', open ? 'true' : 'false')
+      if (open) {
+        historyDropdown?.classList.remove('visible')
+        historyBtn?.setAttribute('aria-expanded', 'false')
+      }
+    })
+
+    addEventListener('click', e => {
+      if (!e.target.closest('#brand .nav-actions')) closeAllDropdowns()
+    })
+
+    document.getElementById('history-undo')?.addEventListener('click', async e => {
+      e.preventDefault()
+      const ok = await versionUndo()
+      notify(ok ? 'Previous version' : 'No previous version')
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('history-redo')?.addEventListener('click', async e => {
+      e.preventDefault()
+      const ok = await versionRedo()
+      notify(ok ? 'Next version' : 'Nothing to redo')
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('history-reset')?.addEventListener('click', e => {
+      e.preventDefault()
+      resetToHead()
+      notify('History cleared')
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('save-btn')?.addEventListener('click', () => save())
+    
+    document.getElementById('new-note-btn')?.addEventListener('click', () => {
+      newNote()
+      notify('New note')
+    })
+
+    document.getElementById('share-copy-link')?.addEventListener('click', e => {
+      e.preventDefault()
+      if (!navigator.clipboard) { alert('Clipboard not supported'); return }
+      navigator.clipboard.writeText(location.href)
+      notify('Link copied')
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('share-export-txt')?.addEventListener('click', e => {
+      e.preventDefault()
+      downloadTXT()
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('share-export-html')?.addEventListener('click', e => {
+      e.preventDefault()
+      downloadHTML()
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('share-export-md')?.addEventListener('click', e => {
+      e.preventDefault()
+      downloadMD()
+      closeAllDropdowns()
+    })
+    
+    document.getElementById('lock-btn')?.addEventListener('click', e => {
+      e.preventDefault()
+      if (encryptedContent) return
+      if (!window.crypto?.subtle) {
+        notify('Encryption requires HTTPS or localhost')
+        return
+      }
+      closeAllDropdowns()
+      document.getElementById('password-modal-overlay')?.classList.add('visible')
+      document.getElementById('lock-password')?.focus()
+    })
+    
+    document.getElementById('password-modal-cancel')?.addEventListener('click', () => {
+      document.getElementById('password-modal-overlay')?.classList.remove('visible')
+      document.getElementById('lock-password').value = ''
+      document.getElementById('lock-password-confirm').value = ''
+    })
+    
+    document.getElementById('password-modal-confirm')?.addEventListener('click', async () => {
+      const pw = document.getElementById('lock-password')
+      const pwConfirm = document.getElementById('lock-password-confirm')
+      const password = pw?.value
+      if (!password || password.length < 1) {
+        notify('Enter a password')
+        return
+      }
+      if (password !== pwConfirm?.value) {
+        notify('Passwords do not match')
+        return
+      }
+      document.getElementById('password-modal-overlay')?.classList.remove('visible')
+      pw.value = ''
+      if (pwConfirm) pwConfirm.value = ''
+      const confirmBtn = document.getElementById('password-modal-confirm')
+      confirmBtn.disabled = true
+      confirmBtn.textContent = 'Locking…'
+      try {
+        const prevHead = getHeadHash()
+        const hashStr = await encryptBlocks(blocks, password)
+        const hash = '#' + hashStr
+        history.replaceState({}, '', buildUrl(hash))
+        try {
+          pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
+          localStorage.setItem('hash', hash)
+        } catch (e) {}
+        encryptedContent = (() => { const d = decodeBase85(hashStr); return d.slice(1) })()
+        blocks = [createBlock('p', '')]
+        document.getElementById('editor-wrap')?.classList.add('encrypted-mode')
+        updateLockButtonVisibility()
+        renderAllBlocks()
+        updateTitle()
+        updateQR()
+        updateStatusBar()
+        notify('Note locked')
+      } catch (err) {
+        console.error(err)
+        notify('Failed to lock. Requires HTTPS or localhost.')
+      } finally {
+        confirmBtn.disabled = false
+        confirmBtn.textContent = 'Lock'
+      }
+    })
+    
+    document.getElementById('unlock-btn')?.addEventListener('click', async () => {
+      const passwordInput = document.getElementById('unlock-password')
+      const btn = document.getElementById('unlock-btn')
+      const password = passwordInput?.value
+      if (!encryptedContent || !password) return
+      btn.disabled = true
+      btn.textContent = 'Unlocking…'
+      const decrypted = await decryptToBlocks(encryptedContent, password)
+      btn.disabled = false
+      btn.textContent = 'Unlock'
+      if (!decrypted) {
+        notify('Wrong password')
+        passwordInput?.focus()
+        passwordInput?.select()
+        return
+      }
+      blocks = decrypted
+      encryptedContent = null
+      document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
+      updateLockButtonVisibility()
+      document.getElementById('unlock-password').value = ''
+      const prevHead = getHeadHash()
+      const hash = '#' + await compressBlocks(blocks)
+      history.replaceState({}, '', buildUrl(hash))
+      try {
+        pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
+        localStorage.setItem('hash', hash)
+      } catch (e) {}
+      renderAllBlocks()
+      updateTitle()
+      updateQR()
+      updateStatusBar()
+      notify('Unlocked')
+    })
+    
+    document.getElementById('unlock-password')?.addEventListener('keydown', e => {
+      if (e.code === 'Enter') document.getElementById('unlock-btn')?.click()
+    })
+    
+    document.getElementById('lock-password')?.addEventListener('keydown', e => {
+      if (e.code === 'Enter') document.getElementById('password-modal-confirm')?.click()
+    })
+    document.getElementById('lock-password-confirm')?.addEventListener('keydown', e => {
+      if (e.code === 'Enter') document.getElementById('password-modal-confirm')?.click()
+    })
+    
+    function togglePasswordVisibility(inputId, btnId) {
+      const input = document.getElementById(inputId)
+      const btn = document.getElementById(btnId)
+      if (!input || !btn) return
+      const isPass = input.type === 'password'
+      input.type = isPass ? 'text' : 'password'
+      btn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password')
+      btn.title = isPass ? 'Hide password' : 'Show password'
+      btn.innerHTML = isPass
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+    }
+    
+    document.getElementById('unlock-password-toggle')?.addEventListener('click', () => {
+      togglePasswordVisibility('unlock-password', 'unlock-password-toggle')
+    })
+    document.getElementById('lock-password-toggle')?.addEventListener('click', () => {
+      togglePasswordVisibility('lock-password', 'lock-password-toggle')
+    })
+    document.getElementById('lock-password-confirm-toggle')?.addEventListener('click', () => {
+      togglePasswordVisibility('lock-password-confirm', 'lock-password-confirm-toggle')
+    })
+    
+    document.getElementById('password-modal-overlay')?.addEventListener('click', e => {
+      if (e.target.id === 'password-modal-overlay') {
+        document.getElementById('password-modal-overlay')?.classList.remove('visible')
+        document.getElementById('lock-password').value = ''
+        document.getElementById('lock-password-confirm').value = ''
+      }
+    })
+
+    document.getElementById('diff-modal-close')?.addEventListener('click', closeDiffModal)
+    document.getElementById('diff-modal-overlay')?.addEventListener('click', e => {
+      if (e.target.id === 'diff-modal-overlay') closeDiffModal()
+    })
+  }
+
+  addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const diffOverlay = document.getElementById('diff-modal-overlay')
+      if (diffOverlay?.classList.contains('visible')) {
+        closeDiffModal()
+        e.preventDefault()
+      }
+      return
+    }
+  })
+
+  // Global keyboard shortcuts
+  addEventListener('keydown', e => {
+    if (!(e.metaKey || e.ctrlKey)) return
+    
+    if (e.code === 'KeyS') {
+      e.preventDefault()
+      save()
+      notify('Saved')
+      return
+    }
+    
+    if (e.code === 'KeyN') {
+      e.preventDefault()
+      newNote()
+      notify('New note')
+      return
+    }
+    
+    if (e.code === 'KeyO') {
+      e.preventDefault()
+      importFile().then(() => notify('File imported')).catch(() => {})
+      return
+    }
+  })
+
+  // Initialize
+  initUI()
+  initTheme()
+
+  addEventListener('DOMContentLoaded', () => {
+    const t = getThemeFromUrl()
+    if (t) theme = t
+    else if (theme === null) theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    applyTheme(theme)
+    load()
+  })
+
+  addEventListener('hashchange', () => {
+    if (previewHash) return
+    load().catch(e => console.error('Load error:', e))
+  })
+
+  addEventListener('popstate', () => {
+    const t = getThemeFromUrl()
+    if (t !== null) theme = t
+    applyTheme(theme)
+    previewHash = null
+    load().catch(e => console.error('Load error:', e))
+  })
+
+  addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      previewHash = null
+      load().catch(err => console.error('Load error:', err))
+    }
+  })
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {})
+  }
+
+  console.log('%ckheMessage — https://msg.khe.money', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px;')
+</script>
+<svg style="display: none" aria-hidden="true" focusable="false">
+  <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"
+          class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path d="M12 5l0 14"/>
+    <path d="M5 12l14 0"/>
+  </symbol>
+  <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path d="M8 9h-1a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-1"/>
+    <path d="M12 14v-11"/>
+    <path d="M9 6l3 -3l3 3"/>
+  </symbol>
+  <symbol id="icon-qrcode" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/>
+    <path d="M7 17l0 .01"/>
+    <path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/>
+    <path d="M7 7l0 .01"/>
+    <path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"/>
+    <path d="M17 7l0 .01"/>
+    <path d="M14 14l3 0"/>
+    <path d="M20 14l0 .01"/>
+    <path d="M14 14l0 3"/>
+    <path d="M14 20l3 0"/>
+    <path d="M17 17l3 0"/>
+    <path d="M20 17l0 3"/>
+  </symbol>
+  <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+    <path
+      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/>
+  </symbol>
+  <symbol id="icon-empty" viewBox="0 0 24 24"></symbol>
+</svg>

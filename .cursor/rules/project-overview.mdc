@@ -1,0 +1,66 @@
+---
+description: "Core project context and architecture for kheMessage - a minimal in-browser text editor with URL-based storage"
+alwaysApply: true
+---
+
+# kheMessage Project Overview
+
+kheMessage is a minimal, in-browser text editor that stores everything in the URL. No backend, no accounts.
+
+## Architecture
+
+- **Single HTML file**: All structure, styles, and script in `index.html`
+- **No build step**: Vanilla HTML/CSS/JavaScript
+- **No backend**: All data stored in URL hash and localStorage
+- **PWA**: Installable with service worker for offline support
+
+## Core Technologies
+
+- **Compression**: `CompressionStream` / `DecompressionStream` (deflate-raw) + `Uint8Array.toBase64` (base64url)
+- **Storage**: `location.hash`, `history.replaceState`, `localStorage`
+- **Fonts**: Instrument Serif (Google Fonts)
+- **Icons**: Inline SVGs (Heroicons-style)
+- **Cursors**: Custom Windows 11 concept cursors (light/dark)
+
+## Key Features
+
+1. **URL as storage** — Content compressed and stored in URL hash
+2. **Share by link** — Copy URL to share content
+3. **QR code** — `/qr` page and bottom-right panel QR
+4. **Local version history** — Git-like branching in localStorage
+5. **Theme** — Light/dark via `?theme=` or system preference
+6. **PWA** — Offline support via service worker
+
+## File Structure
+
+```
+kheMessage/
+├── index.html          # Main app (single-file: CSS + HTML + JS)
+│   └── Sections: reset/themes → layout/components → block model → compression → encryption → UI → init
+├── qr.html             # Full-page QR code view
+├── 404.html            # Fallback (Vercel/GitHub Pages)
+├── qrcode.js           # QR code generation library
+├── sw.js               # Service worker for PWA
+├── manifest.json       # PWA manifest
+├── vercel.json         # Vercel deployment config
+├── .github/workflows/  # CI (Vercel deploy)
+└── windows_11_cursors_concept_by_jepricreations_densjkc/
+    ├── light/          # Light theme cursors
+    └── dark/           # Dark theme cursors
+```
+
+## Data Flow
+
+1. User types in `contenteditable` article
+2. Changes debounced (1200ms) then saved
+3. Content compressed → base64url hash
+4. Hash written to URL and localStorage
+5. Version entry appended to local history
+
+## Code Style
+
+- Use vanilla JavaScript (ES2020+)
+- Keep everything in single HTML file when possible
+- Use CSS custom properties for theming
+- Follow existing naming conventions
+- Maintain accessibility (ARIA labels, semantic HTML)

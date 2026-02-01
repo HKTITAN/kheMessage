@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191919" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<title>404 · kheMessage</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    --bg: #ffffff;
+    --text: #37352f;
+    --text-muted: rgba(55, 53, 47, 0.65);
+    --border: rgba(55, 53, 47, 0.09);
+    --link: #0b6bcb;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html {
+      --bg: #191919;
+      --text: #ebebeb;
+      --text-muted: rgba(235, 235, 235, 0.65);
+      --border: rgba(255, 255, 255, 0.09);
+      --link: #6eb3f7;
+    }
+  }
+
+  body {
+    font-family: "Instrument Serif", Georgia, serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    padding-top: 100px;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  #brand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-size: 1.25rem;
+  }
+
+  #brand a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  #brand a:hover { color: var(--text-muted); }
+
+  #brand .brand-link { display: inline-block; position: relative; min-width: 6.5em; }
+  #brand .brand-link .brand-default,
+  #brand .brand-link .brand-hover { display: inline-block; transition: opacity 0.25s ease, transform 0.25s ease; }
+  #brand .brand-link .brand-hover { position: absolute; left: 0; top: 0; opacity: 0; transform: translateY(4px); }
+  #brand .brand-link:hover .brand-default { opacity: 0; transform: translateY(-4px); }
+  #brand .brand-link:hover .brand-hover { opacity: 1; transform: translateY(0); }
+
+  h1 {
+    font-size: 2em;
+    font-weight: 400;
+    margin-bottom: 0.5em;
+  }
+
+  p {
+    color: var(--text-muted);
+    margin-bottom: 1.5em;
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+  }
+
+  a:hover { border-bottom-color: var(--link); }
+</style>
+<body>
+  <header id="brand"><a href="/" class="brand-link" aria-label="kheMessage — msg.khe.money" title="msg.khe.money"><span class="brand-default" aria-hidden="true">kheMessage</span><span class="brand-hover" aria-hidden="true">msg.khe.money</span></a></header>
+  <h1>404</h1>
+  <p>This page doesn’t exist.</p>
+  <a href="/">Back to kheMessage</a>
+</body>

@@ -1,0 +1,103 @@
+---
+description: "HTML, CSS, and JavaScript patterns for single-file web apps"
+globs: ["*.html", "*.htm"]
+---
+
+# HTML/CSS/JS Patterns for kheMessage
+
+## Single-File Architecture
+
+This project uses a single HTML file with embedded CSS and JavaScript. When making changes:
+
+1. Keep styles in the `<style>` block at the top
+2. Keep scripts in the `<script>` block at the bottom
+3. Use inline SVG symbols in a hidden SVG element
+
+## CSS Conventions
+
+### Theme Variables
+
+Always use CSS custom properties for colors:
+
+```css
+/* Light theme */
+--bg: #fafaf9;
+--text: #1c1917;
+--border: rgba(28, 25, 23, 0.1);
+
+/* Dark theme */
+html.dark {
+  --bg: #1c1917;
+  --text: #fafaf9;
+}
+```
+
+### Transitions
+
+Add smooth transitions for theme changes:
+
+```css
+transition: background-color 0.4s ease, color 0.4s ease;
+```
+
+### Custom Cursors
+
+Use cursor variables that switch with theme:
+
+```css
+cursor: var(--cursor-pointer);
+cursor: var(--cursor-text);
+```
+
+## JavaScript Conventions
+
+### Async/Await
+
+Use modern async/await for compression operations:
+
+```javascript
+async function compress(string) {
+  const byteArray = new TextEncoder().encode(string)
+  const stream = new CompressionStream('deflate-raw')
+  // ...
+}
+```
+
+### Debouncing
+
+Use debounce for input handlers:
+
+```javascript
+article.addEventListener('input', debounce(1200, scheduleSave))
+```
+
+### requestIdleCallback
+
+Use idle callbacks for non-critical updates:
+
+```javascript
+if (typeof requestIdleCallback !== 'undefined') {
+  requestIdleCallback(() => updateUI(), { timeout: 2000 })
+} else {
+  setTimeout(() => updateUI(), 0)
+}
+```
+
+### localStorage Safety
+
+Always wrap localStorage in try/catch:
+
+```javascript
+try {
+  localStorage.setItem('hash', hash)
+} catch (e) {
+  // Storage might be full or disabled
+}
+```
+
+## Accessibility
+
+- Use semantic HTML elements (`<article>`, `<header>`, `<nav>`)
+- Add `aria-label` to interactive elements
+- Use `role` attributes for custom widgets
+- Support keyboard navigation

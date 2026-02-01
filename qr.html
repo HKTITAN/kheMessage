@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191919" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<title>QR Code · kheMessage</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    --bg: #ffffff;
+    --text: #37352f;
+    --border: rgba(55, 53, 47, 0.09);
+    --link: #0b6bcb;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html { --bg: #191919; --text: #ebebeb; --border: rgba(255, 255, 255, 0.09); --link: #6eb3f7; }
+  }
+
+  #brand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 1.25rem;
+  }
+
+  #brand a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  #brand a:hover { color: rgba(55, 53, 47, 0.65); }
+
+  @media (prefers-color-scheme: dark) {
+    #brand a:hover { color: rgba(235, 235, 235, 0.65); }
+  }
+
+  #brand .brand-link { display: inline-block; position: relative; min-width: 6.5em; }
+  #brand .brand-link .brand-default,
+  #brand .brand-link .brand-hover { display: inline-block; transition: opacity 0.25s ease, transform 0.25s ease; }
+  #brand .brand-link .brand-hover { position: absolute; left: 0; top: 0; opacity: 0; transform: translateY(4px); }
+  #brand .brand-link:hover .brand-default { opacity: 0; transform: translateY(-4px); }
+  #brand .brand-link:hover .brand-hover { opacity: 1; transform: translateY(0); }
+
+  body {
+    font-family: "Instrument Serif", Georgia, serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-size: 18px;
+    line-height: 1.6;
+    padding: 24px;
+    padding-top: 100px;
+  }
+
+  #qrcode {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #qrcode { background: #2f2f2f; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+  }
+
+  #qrcode svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 400px;
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+  }
+
+  a:hover { border-bottom-color: var(--link); }
+</style>
+<header id="brand"><a href="/" class="brand-link" aria-label="kheMessage — msg.khe.money" title="msg.khe.money"><span class="brand-default" aria-hidden="true">kheMessage</span><span class="brand-hover" aria-hidden="true">msg.khe.money</span></a></header>
+<div id="qrcode"></div>
+<a id="link" href="/">Back to kheMessage</a>
+
+<script src="qrcode.js"></script>
+<script>
+  function render() {
+    const hash = location.hash
+    // Use dynamic URL based on current location (works with any domain)
+    // Note: Update this URL if deploying to a different domain than msg.khe.money
+    const baseUrl = location.origin
+    const url = baseUrl + '/' + hash
+    const link = document.getElementById('link')
+    link.href = '/' + hash
+
+    const typeNumber = 0
+    const errorCorrectionLevel = 'L'
+    const qr = qrcode(typeNumber, errorCorrectionLevel)
+    qr.addData(url)
+    qr.make()
+    document.getElementById('qrcode').innerHTML = qr.createSvgTag({cellSize: 8, margin: 0})
+  }
+
+  render()
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+  }
+  addEventListener('hashchange', render)
+</script>

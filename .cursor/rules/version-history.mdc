@@ -1,0 +1,67 @@
+---
+description: "Version history and branching system patterns"
+alwaysApply: false
+---
+
+# Version History System
+
+kheMessage implements a Git-like version history in localStorage.
+
+## Data Structure
+
+```javascript
+// Version entry (stored in list; legacy 'parent' migrated to 'parents')
+{
+  hash: '#base64url...',   // Compressed content hash
+  t: 1234567890,           // Timestamp (Date.now())
+  parents: ['#parent...']  // Array: one for normal commit, two for merge commit; [] for root
+}
+```
+
+- **Normal commit**: `parents = [previousHead]` or `[]` for root.
+- **Merge commit**: `parents = [currentHead, otherBranchHash]` (two parents).
+
+## Key Constants
+
+```javascript
+const VERSION_KEY = 'kheMessage_localVersions'
+const MAX_VERSIONS = 50
+```
+
+## Operations
+
+### Push Version
+- Normalize `parents` (array); prepend or update entry by hash
+- Trim to MAX_VERSIONS; never remove entry whose hash equals current head
+
+### Version Undo
+- Move head to first parent (`parents[0]`)
+- Push current head to redo stack
+
+### Version Redo
+- Pop from redo stack
+- Set as new head
+
+### Merge
+- Create merged content (head + divider + source blocks), compress to hash
+- Push merge commit: `pushLocalVersion(mergedHash, [head, sourceHash])`
+- Set head to merged hash (no call to save())
+
+### Reset
+- Clear all history
+- Keep only current head (single entry with `parents: []`)
+
+## Graph Rendering
+
+The history graph uses SVG (GitHub-style):
+- X-axis: time (left to right); Y-axis: branches (stacked rows)
+- Nodes: circles with click handlers; merge commits have `.merge` class
+- Edges: curved paths (quadratic Bezier) from each parent to child; merge commits have two incoming edges
+
+## Preview Mode
+
+When previewing a version:
+1. Load version content (read-only)
+2. Show preview banner
+3. Highlight node in graph
+4. Allow restore or return to current

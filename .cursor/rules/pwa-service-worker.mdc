@@ -1,0 +1,43 @@
+---
+description: "PWA and service worker patterns for offline support"
+globs: ["sw.js", "manifest.json"]
+---
+
+# PWA and Service Worker Guidelines
+
+## Service Worker (sw.js)
+
+The service worker enables offline functionality. When modifying:
+
+1. **Cache versioning**: Update cache name on changes
+2. **Cache strategy**: Use cache-first for assets, network-first for dynamic content
+3. **Skip waiting**: Allow immediate activation of new versions
+
+### Cache Pattern
+
+```javascript
+const CACHE_NAME = 'khemessage-v1'
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/qr.html',
+  '/qrcode.js',
+  '/manifest.json'
+]
+```
+
+## Manifest (manifest.json)
+
+PWA manifest requirements:
+
+1. **Icons**: Provide multiple sizes (192x192, 512x512)
+2. **Theme color**: Match light theme background
+3. **Display**: Use `standalone` for app-like experience
+4. **Start URL**: Use `/?source=pwa`
+
+## Testing PWA
+
+1. Check Application panel in DevTools
+2. Test offline mode
+3. Verify installability
+4. Test on mobile devices

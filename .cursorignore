@@ -1,0 +1,42 @@
+# Cursor Ignore File
+# Files and directories to exclude from Cursor AI context
+
+# Third-party cursor assets (binary files)
+windows_11_cursors_concept_by_jepricreations_densjkc/**/*.cur
+windows_11_cursors_concept_by_jepricreations_densjkc/**/*.ani
+windows_11_cursors_concept_by_jepricreations_densjkc/*.jpg
+windows_11_cursors_concept_by_jepricreations_densjkc/*.url
+
+# GitHub assets (images)
+.github/**/*.png
+.github/**/*.jpg
+.github/**/*.gif
+
+# Minified/generated files
+*.min.js
+*.min.css
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files (if any added in future)
+.env
+.env.*
+
+# Build artifacts (if any added in future)
+dist/
+build/
+out/

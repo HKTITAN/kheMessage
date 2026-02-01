@@ -1,0 +1,17 @@
+{
+  "$schema": "https://cursor.com/schemas/settings.json",
+  "project": {
+    "name": "kheMessage",
+    "description": "Minimal in-browser text editor with URL-based storage",
+    "type": "web",
+    "language": "javascript"
+  },
+  "ai": {
+    "codeStyle": {
+      "preferAsync": true,
+      "useModernSyntax": true,
+      "indentStyle": "spaces",
+      "indentSize": 2
+    }
+  }
+}

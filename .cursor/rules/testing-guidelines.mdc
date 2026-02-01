@@ -1,0 +1,72 @@
+---
+description: "Testing guidelines for kheMessage - manual testing procedures and verification steps"
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+kheMessage uses manual testing due to its single-file architecture.
+
+## Testing Checklist
+
+### Core Features
+
+1. **Editor**
+   - [ ] Type text and verify it appears
+   - [ ] Markdown renders correctly (headers, bold, italic, code)
+   - [ ] Undo/redo works (Ctrl+Z, Ctrl+Y)
+   - [ ] Content persists on page refresh
+
+2. **URL Storage**
+   - [ ] URL hash updates when content changes
+   - [ ] Opening URL loads content correctly
+   - [ ] Special characters work (emoji, unicode)
+   - [ ] Long content doesn't exceed URL limits
+
+3. **Version History**
+   - [ ] Versions appear in history dropdown
+   - [ ] Version undo/redo works
+   - [ ] Preview mode shows old version
+   - [ ] Restore version works
+   - [ ] Reset clears history
+
+4. **Theme**
+   - [ ] Toggle switches between light/dark
+   - [ ] URL parameter (`?theme=dark`) works
+   - [ ] System preference respected
+   - [ ] All UI elements adapt
+
+5. **Share**
+   - [ ] Copy link copies to clipboard
+   - [ ] Export TXT downloads text file
+   - [ ] Export HTML downloads styled HTML
+   - [ ] Export MD downloads markdown
+
+6. **QR Code**
+   - [ ] QR code renders in panel
+   - [ ] QR code updates with URL
+   - [ ] Full-page QR works (/qr)
+
+7. **PWA**
+   - [ ] App is installable
+   - [ ] Works offline after install
+   - [ ] Service worker caches assets
+
+## Browser Testing
+
+Test in these browsers:
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- Mobile Safari
+- Mobile Chrome
+
+## Edge Cases
+
+- Empty document
+- Single character
+- Maximum length content
+- Content with only special characters
+- Rapid consecutive saves
+- Multiple tabs with same content
