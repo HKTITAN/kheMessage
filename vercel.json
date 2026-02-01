@@ -76,7 +76,16 @@
       ]
     },
     {
-      "source": "/(.*\\.(cur|ani))",
+      "source": "/:path(.*)\\.cur",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/:path(.*)\\.ani",
       "headers": [
         {
           "key": "Cache-Control",
