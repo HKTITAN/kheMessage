@@ -3809,11 +3809,15 @@
       } else {
         console.error('Failed to load:', e)
         blocks = [createBlock('p', '')]
+        const isTruncated = e?.message?.includes('truncated') ||
+          (e?.name === 'TypeError' && e?.message?.includes('Failed to fetch'))
         const isCorrupt = e?.message?.includes('Invalid or corrupt') ||
           e?.message?.includes('invalid distance') ||
-          e?.message?.includes('not valid') ||
-          (e?.name === 'TypeError' && e?.message?.includes('Failed to fetch'))
-        if (isCorrupt) {
+          e?.message?.includes('not valid')
+        if (isTruncated) {
+          notify('Could not load — link may have been truncated when shared')
+        }
+        if (isCorrupt && !isTruncated) {
           history.replaceState({}, '', buildUrl(''))
           try { localStorage.removeItem('hash') } catch (_) {}
         }
