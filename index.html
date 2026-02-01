@@ -3924,11 +3924,21 @@
   }
   
   function getHashFromUrl() {
-    const raw = location.hash.slice(1)
+    let raw = location.hash.slice(1)
     if (!raw) return ''
     if (raw.includes('undefined')) return ''
     try {
-      return decodeURIComponent(raw)
+      let decoded = raw
+      let prev
+      while (decoded !== prev) {
+        prev = decoded
+        try {
+          decoded = decodeURIComponent(decoded)
+        } catch {
+          break
+        }
+      }
+      return decoded
     } catch {
       return raw
     }
@@ -5025,13 +5035,19 @@
   initUI()
   initTheme()
 
-  addEventListener('DOMContentLoaded', () => {
+  function runInit() {
     const t = getThemeFromUrl()
     if (t) theme = t
     else if (theme === null) theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     applyTheme(theme)
     load()
-  })
+  }
+
+  if (document.readyState === 'loading') {
+    addEventListener('DOMContentLoaded', runInit)
+  } else {
+    runInit()
+  }
 
   addEventListener('hashchange', () => {
     if (previewHash) return
