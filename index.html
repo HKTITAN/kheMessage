@@ -2543,6 +2543,25 @@
     return encodeBase85(withFmt)
   }
 
+  async function compressCompact(blocks) {
+    const markdown = blocksToMarkdown(blocks) + '\x00'
+    const bytes = new TextEncoder().encode(markdown)
+    const stream = new CompressionStream('deflate-raw')
+    const writer = stream.writable.getWriter()
+    writer.write(bytes)
+    writer.close()
+    const buffer = await new Response(stream.readable).arrayBuffer()
+    return new Uint8Array(buffer).toBase64({alphabet: 'base64url'})
+  }
+
+  async function getShortestHash(blocks) {
+    const [hashBinary, hashCompact] = await Promise.all([
+      compressBlocks(blocks),
+      compressCompact(blocks)
+    ])
+    return hashCompact.length < hashBinary.length ? hashCompact : hashBinary
+  }
+
   async function decompressToBlocks(hashStr) {
     if (!hashStr || typeof hashStr !== 'string' || hashStr.includes('undefined')) {
       throw new Error('Invalid or corrupt hash')
@@ -3752,7 +3771,7 @@
     
     const head = getHeadHash()
     const prevHash = head || (getLocalVersions()[0]?.hash) || null
-    const hash = '#' + await compressBlocks(blocks)
+    const hash = '#' + await getShortestHash(blocks)
     
     if (getHashFromUrl() !== hash.slice(1)) {
       history.replaceState({}, '', buildUrl(hash))
@@ -3808,18 +3827,35 @@
         updateUnlockBannerText()
       } else {
         console.error('Failed to load:', e)
-        blocks = [createBlock('p', '')]
         const isTruncated = e?.message?.includes('truncated') ||
           (e?.name === 'TypeError' && e?.message?.includes('Failed to fetch'))
         const isCorrupt = e?.message?.includes('Invalid or corrupt') ||
           e?.message?.includes('invalid distance') ||
           e?.message?.includes('not valid')
+
         if (isTruncated) {
-          notify('Could not load — link may have been truncated when shared')
-        }
-        if (isCorrupt && !isTruncated) {
-          history.replaceState({}, '', buildUrl(''))
-          try { localStorage.removeItem('hash') } catch (_) {}
+          const hashRaw = getHashFromUrl()
+          const recovered = tryRecoverFromTruncatedHash(hashRaw)
+          if (recovered) {
+            try {
+              blocks = await decompressToBlocks(recovered)
+              history.replaceState({}, '', buildUrl('#' + recovered))
+              try { localStorage.setItem('hash', '#' + recovered) } catch (_) {}
+              notify('Loaded from local backup — link was truncated')
+            } catch (_) {
+              blocks = [createBlock('p', '')]
+              notify('Could not load — link may have been truncated when shared')
+            }
+          } else {
+            blocks = [createBlock('p', '')]
+            notify('Could not load — link may have been truncated when shared')
+          }
+        } else {
+          blocks = [createBlock('p', '')]
+          if (isCorrupt) {
+            history.replaceState({}, '', buildUrl(''))
+            try { localStorage.removeItem('hash') } catch (_) {}
+          }
         }
       }
     }
@@ -3928,24 +3964,31 @@
   }
   
   function getHashFromUrl() {
-    let raw = location.hash.slice(1)
+    const raw = location.hash.slice(1)
     if (!raw) return ''
     if (raw.includes('undefined')) return ''
     try {
-      let decoded = raw
-      let prev
-      while (decoded !== prev) {
-        prev = decoded
-        try {
-          decoded = decodeURIComponent(decoded)
-        } catch {
-          break
-        }
-      }
-      return decoded
+      return decodeURIComponent(raw)
     } catch {
       return raw
     }
+  }
+
+  function tryRecoverFromTruncatedHash(truncated) {
+    if (!truncated || truncated.length < 40) return null
+    const norm = (h) => (h && h.startsWith('#') ? h.slice(1) : h) || ''
+    const candidates = []
+    try {
+      const head = localStorage.getItem('hash')
+      if (head) candidates.push(norm(head))
+      for (const v of getLocalVersions()) {
+        if (v.hash) candidates.push(norm(v.hash))
+      }
+      for (const full of candidates) {
+        if (full.length > truncated.length && full.startsWith(truncated)) return full
+      }
+    } catch (_) {}
+    return null
   }
 
   function applyTheme(t) {
@@ -4378,7 +4421,7 @@
         const divider = createBlock('divider')
         mergedBlocks = [...headBlocks, divider, ...sourceBlocks]
       }
-      const mergedHash = '#' + await compressBlocks(mergedBlocks)
+      const mergedHash = '#' + await getShortestHash(mergedBlocks)
       pushLocalVersion(mergedHash, [head, source].filter(Boolean))
       try { localStorage.setItem('hash', mergedHash) } catch (e) {}
       history.replaceState({}, '', buildUrl(mergedHash))
@@ -4938,7 +4981,7 @@
       updateLockButtonVisibility()
       document.getElementById('unlock-password').value = ''
       const prevHead = getHeadHash()
-      const hash = '#' + await compressBlocks(blocks)
+      const hash = '#' + await getShortestHash(blocks)
       history.replaceState({}, '', buildUrl(hash))
       try {
         pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
