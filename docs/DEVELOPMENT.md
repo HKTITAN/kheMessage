@@ -23,6 +23,8 @@ php -S localhost:8000
 
 Then visit `http://localhost:8000`.
 
+> **Tip:** Encryption (password lock) requires HTTPS or localhost because WebCrypto is only available in secure contexts.
+
 ### Option 3: VS Code Live Server
 
 Use the Live Server extension to serve the project.
@@ -68,6 +70,12 @@ See [docs/TESTING.md](TESTING.md) for the full testing checklist. Before submitt
 3. Test PWA (install, offline)
 4. Test keyboard navigation
 5. Check console for errors
+
+## URL Storage + Limits (Developer Notes)
+
+- **Share URL computation**: The app computes the share URL from the current saved hash (origin + path + optional theme + hash). Status bar and QR use this computed URL so the displayed size matches the actual share link.
+- **Limits are conservative**: The 8 KB “danger” threshold is a safety limit; real platform maximums vary. The app blocks input at the danger threshold to prevent broken links.
+- **Local files**: When running from `file://`, share URLs reuse the current file path + hash because `location.origin` is `null`.
 
 ## Cursor IDE
 
