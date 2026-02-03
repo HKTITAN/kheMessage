@@ -31,8 +31,8 @@ A line-by-line map of the main application file and key functions.
 | ~3840–4030 | Save/load | `save`, `load`, `setFromHash`, URL updates |
 | ~4030–4125 | Theme | Light/dark toggle, URL param, system preference |
 | ~4125–4685 | Version history | `pushLocalVersion`, `versionUndo`, `versionRedo`, `enterPreview`, `exitPreview` |
-| ~4685–4760 | UI helpers | `setSaveStatus`, `notify`, `updateQR` |
-| ~4588–4727 | Export | `downloadTXT`, `downloadHTML`, `downloadMD` |
+| ~4685–4756 | UI helpers | `setSaveStatus`, `notify`, `updateQR` |
+| ~4756–4940 | Export | `downloadTXT`, `downloadHTML`, `downloadMD` |
 | ~4727–5100 | Initialization | DOM ready, hash load, event listeners, Editor setup |
 
 ## Key Functions

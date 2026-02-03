@@ -5110,6 +5110,21 @@
       document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
       updateLockButtonVisibility()
       document.getElementById('unlock-password').value = ''
+      renderAllBlocks()
+
+      if (previewHash) {
+        const wrap = document.getElementById('editor-wrap')
+        const text = document.getElementById('preview-banner-text')
+        if (wrap) wrap.classList.add('preview-mode')
+        if (text) text.textContent = 'Previewing ' + formatVersionLabel(previewHash)
+        updateTitle()
+        updateQR()
+        updateStatusBar()
+        renderHistoryGraph()
+        notify('Unlocked preview')
+        return
+      }
+
       const prevHead = getHeadHash()
       const hash = '#' + await getShortestHash(blocks)
       history.replaceState({}, '', buildUrl(hash))
@@ -5119,7 +5134,6 @@
         pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
         localStorage.setItem('hash', hash)
       } catch (e) {}
-      renderAllBlocks()
       updateTitle()
       updateQR()
       updateStatusBar()
