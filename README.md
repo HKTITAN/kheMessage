@@ -9,6 +9,7 @@ A minimal, in-browser text editor that stores everything in the URL. Part of [kh
 <p align="center">
   <img src=".github/kheMessage-screenshot.png" alt="Screenshot of kheMessage" width="696">
 </p>
+This page can be viewed at: https://msg.khe.money/?theme=light#80itVPBUSMxV8EgsKs7ILFHwzkjNTczL1ONyzEtRKMnILFbILFbIzkj1TS0uTkxP1WMAAA%3D%3D
 
 ---
 
