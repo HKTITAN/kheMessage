@@ -31,15 +31,15 @@ python -m http.server 8000
 
 - **Block editor** — Notion-style blocks: `/` for slash commands, Tab/Shift+Tab to indent, drag handles to reorder. Supports headings, lists, todos, code, quotes, callouts, dividers, toggles.
 - **URL as storage** — Content is compressed (binary + deflate/brotli + base85) and stored in the URL hash. ~25–40% more capacity than before. No backend, no accounts.
-- **Share by link** — Copy the URL to share; recipients see the same content when they open it.
+- **Share by link** — Copy the URL to share; recipients see the same content when they open it. Share/QR links are computed from the current saved hash.
 - **QR code** — Use `/qr` for a QR code of the current page; a small QR is also shown in the bottom-right panel.
 - **Local version history** — Git-like branching stored in `localStorage`: each version has a hash, timestamp, and parent. You can undo/redo across versions and create branches by editing an older version and saving.
 - **History graph** — In the **History** menu: SVG graph (time left→right, branches stacked) and a vertical list. Click a version to **preview** it (read-only with a banner); from there you can **Restore this version** or **Back to current**.
 - **Version undo/redo** — Buttons in the History menu step to parent (undo) or forward along the redo stack (redo). Editor undo/redo remains `Ctrl+Z` / `Ctrl+Y`.
 - **Reset** — Clears version history and keeps only the current document as a single version.
 - **Export** — Share menu: **Copy link**, **Export TXT**, **Export HTML**, **Export MD**.
-- **Lock** — Share menu: **Lock with password** encrypts content (AES-GCM). Share the password separately with recipients.
-- **URL size limit** — Status bar shows URL size; at 8 KB input is blocked (typing disabled, paste truncated). Delete content to continue.
+- **Lock** — Share menu: **Lock with password** encrypts content (AES-GCM). Requires HTTPS or localhost. Share the password separately with recipients.
+- **URL size limit** — Status bar shows the computed share URL size with thresholds (safe/warning/danger/critical). At 8 KB input is blocked (typing disabled, paste truncated). Delete content to continue.
 - **Theme** — Light/dark via `?theme=light` or `?theme=dark`, or system preference.
 - **PWA** — Installable; manifest and service worker for offline support.
 
@@ -72,14 +72,46 @@ kheMessage/
 
 ---
 
+## Deployment (static-only)
+
+This project is a **static PWA**: there are no serverless or Edge Functions. Deploy the files as-is on any static host (Vercel, Netlify, GitHub Pages). Vercel configuration lives in `vercel.json` and only defines rewrites/headers/caching.
+
 ## How it works (overview)
 
 1. You type in a **block editor** (Notion-style): each line is a block. Use `/` for slash commands, Tab/Shift+Tab to indent, drag handles to reorder. Content is Markdown-friendly with inline formatting.
-2. Changes are **debounced** (e.g. 1200 ms); then **save** runs: content + optional inline styles are compressed, turned into a hash, and written to the URL and `localStorage`. A **version entry** `{ hash, t, parents }` is appended to local history.
-3. **Version undo** moves to the parent of the current head and pushes the current head onto a redo stack; **version redo** pops from that stack. Any new save clears the redo stack and can create a new branch.
-4. **Preview** loads a chosen version into the editor (read-only), with a banner to restore that version or return to the current head.
+2. Changes are **debounced** (e.g. 1200 ms); then **save** runs: blocks → serialize → compress → hash. The hash is written to the URL and `localStorage`. A **version entry** `{ hash, t, parents }` is appended to local history.
+3. **Share/QR** uses the computed share URL (origin + path + optional theme + hash) so the status bar and QR match what you can copy.
+4. **Version undo** moves to the parent of the current head and pushes the current head onto a redo stack; **version redo** pops from that stack. Any new save clears the redo stack and can create a new branch.
+5. **Preview** loads a chosen version into the editor (read-only), with a banner to restore that version or return to the current head.
 
 For a deeper dive, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+## Storage, limits, and sharing (details)
+
+### URL storage pipeline
+
+Blocks are serialized into a compact binary format, compressed (brotli when available, otherwise deflate-raw), then encoded into a URL-safe base85 or base64url hash. The hash is stored in the URL fragment (`#...`) so there is **no backend** and nothing is sent to a server when you type.
+
+### URL size thresholds
+
+The status bar shows the byte size of the computed share URL. Thresholds are conservative:
+
+- **safe**: 2 KB
+- **warning**: 4 KB
+- **danger**: 8 KB (input blocked)
+- **critical**: 16 KB (most platforms reject these URLs)
+
+These limits are heuristics; browsers and platforms vary in their actual max URL length. The app errs on the safe side.
+
+### Share link and QR
+
+The **Share → Copy link** action saves first (when possible) and copies the computed share URL. QR codes use the same computed URL so QR density matches the actual link length.
+
+### Encryption (password lock)
+
+When you lock a note, the serialized blocks are encrypted with **AES‑GCM** using a key derived from the password (PBKDF2, SHA‑256). Encryption requires **HTTPS or localhost** because WebCrypto is only available in secure contexts.
 
 ---
 
