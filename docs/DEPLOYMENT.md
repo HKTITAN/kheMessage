@@ -44,6 +44,7 @@ The repository includes `.github/workflows/deploy.yaml` that:
 - **Production**: Automatic deploy on push to main branches
 - **Preview**: Automatic deploy on pull requests (URL commented on PR)
 - **Action**: Uses `amondnet/vercel-action@v25`
+- **Secrets guard**: Deploy steps are skipped when required secrets are missing (common for forked PRs).
 
 ### Required GitHub Secrets
 
@@ -74,6 +75,10 @@ The project includes `vercel.json` with:
   - `manifest.json`: `max-age=86400` (1 day)
   - `qrcode.js`: `max-age=31536000, immutable` (1 year)
   - Cursor files: `max-age=31536000, immutable` (1 year)
+
+## No Edge Functions
+
+This project is **static-only** and does not use Vercel Edge Functions or serverless functions. All functionality is client-side in `index.html`.
 
 ## Custom Domain
 

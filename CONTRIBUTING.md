@@ -54,6 +54,13 @@ Before submitting a PR:
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — Vercel deployment
 - [docs/TESTING.md](docs/TESTING.md) — Testing checklist
 
+When you change behavior (storage, sharing, limits, encryption), update the relevant docs and README sections so the system remains self-explanatory.
+
+## Deployment Notes
+
+- This is a **static-only** app. Do not add Edge Functions or serverless code.
+- GitHub Actions deploys to Vercel only when repository secrets are configured.
+
 ## Questions?
 
 Open an issue for bugs, feature requests, or questions.

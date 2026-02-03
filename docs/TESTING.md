@@ -61,8 +61,9 @@ Before deployment, ensure these secrets are configured in GitHub repository sett
 - [ ] URL updates after typing (debounced)
 - [ ] Refreshing page preserves content
 - [ ] Sharing URL works - recipient sees same content
-- [ ] URL size indicator shows in status bar
-- [ ] 8KB limit enforced (typing disabled at limit)
+- [ ] URL size indicator shows in status bar (matches share URL)
+- [ ] 8KB danger limit enforced (typing disabled at limit; paste truncated)
+- [ ] Size warnings appear at 4KB/8KB/16KB thresholds
 
 #### Version History
 
@@ -82,6 +83,7 @@ Before deployment, ensure these secrets are configured in GitHub repository sett
 - [ ] Export TXT downloads correctly
 - [ ] Export HTML downloads correctly
 - [ ] Export MD downloads correctly
+- [ ] Lock/unlock works (AES-GCM) on HTTPS/localhost
 
 #### QR Code
 
@@ -188,6 +190,7 @@ Verify cache headers:
 - [ ] URL with invalid base64
 - [ ] localStorage full/disabled
 - [ ] Service worker registration fails
+- [ ] Password lock unavailable on insecure origins (shows message)
 
 ## Performance Metrics
 

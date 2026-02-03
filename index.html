@@ -2170,7 +2170,7 @@
     </svg>
     <span id="size-warning-text">Large document</span>
   </div>
-  <span id="status-bar-version" class="status-bar-version">msg.khe.money v.2026.02.01</span>
+  <span id="status-bar-version" class="status-bar-version">msg.khe.money v.2026.02.03</span>
 </div>
 
 <div id="notification" class="noprint" role="status" aria-live="polite"></div>
@@ -2249,6 +2249,13 @@
   let versionRedoStack = []
   let theme = null
   let encryptedContent = null
+  let contentVersion = 0
+  let urlMetrics = {
+    url: location.href,
+    size: new Blob([location.href]).size,
+    hash: '',
+    version: 0
+  }
 
   const MAX_INDENT = 5
 
@@ -2566,39 +2573,50 @@
     if (!hashStr || typeof hashStr !== 'string' || hashStr.includes('undefined')) {
       throw new Error('Invalid or corrupt hash')
     }
-    let bytes
-    let fmt = FMT_DEFLATE_B64
-    
-    if (looksLikeBase85(hashStr)) {
-      const decoded = decodeBase85(hashStr)
-      fmt = decoded[0]
-      bytes = decoded.slice(1)
-    } else {
-      bytes = Uint8Array.fromBase64(hashStr, {alphabet: 'base64url'})
+    const attemptOrder = looksLikeBase85(hashStr)
+      ? ['base85', 'base64']
+      : ['base64', 'base85']
+    let lastError
+    for (const attempt of attemptOrder) {
+      try {
+        let bytes
+        let fmt = FMT_DEFLATE_B64
+        if (attempt === 'base85') {
+          const decoded = decodeBase85(hashStr)
+          fmt = decoded[0]
+          bytes = decoded.slice(1)
+        } else {
+          bytes = Uint8Array.fromBase64(hashStr, {alphabet: 'base64url'})
+        }
+        
+        if (fmt === FMT_ENCRYPTED) {
+          const err = new Error('Encrypted content')
+          err.type = 'ENCRYPTED'
+          err.encryptedData = bytes
+          throw err
+        }
+        
+        const alg = (fmt === FMT_BROTLI_B85) ? 'brotli' : 'deflate-raw'
+        const stream = new DecompressionStream(alg)
+        const writer = stream.writable.getWriter()
+        writer.write(bytes)
+        writer.close()
+        const buffer = await new Response(stream.readable).arrayBuffer()
+        const decoded = new Uint8Array(buffer)
+        
+        if (decoded[0] === BINARY_VERSION) {
+          return deserializeBlocks(decoded)
+        }
+        
+        const text = new TextDecoder().decode(decoded)
+        const [content, style] = text.split('\x00')
+        return parseTextToBlocks(content)
+      } catch (err) {
+        if (err?.type === 'ENCRYPTED') throw err
+        lastError = err
+      }
     }
-    
-    if (fmt === FMT_ENCRYPTED) {
-      const err = new Error('Encrypted content')
-      err.type = 'ENCRYPTED'
-      err.encryptedData = bytes
-      throw err
-    }
-    
-    const alg = (fmt === FMT_BROTLI_B85) ? 'brotli' : 'deflate-raw'
-    const stream = new DecompressionStream(alg)
-    const writer = stream.writable.getWriter()
-    writer.write(bytes)
-    writer.close()
-    const buffer = await new Response(stream.readable).arrayBuffer()
-    const decoded = new Uint8Array(buffer)
-    
-    if (decoded[0] === BINARY_VERSION) {
-      return deserializeBlocks(decoded)
-    }
-    
-    const text = new TextDecoder().decode(decoded)
-    const [content, style] = text.split('\x00')
-    return parseTextToBlocks(content)
+    throw lastError || new Error('Invalid or corrupt hash')
   }
   
   // ============================================
@@ -3617,6 +3635,67 @@
   // URL LIMIT ENFORCEMENT
   // ============================================
   
+  function debounce(ms, fn) {
+    let timer
+    return (...args) => {
+      clearTimeout(timer)
+      timer = setTimeout(() => fn(...args), ms)
+    }
+  }
+
+  function normalizeHash(hash) {
+    if (!hash) return ''
+    return hash.startsWith('#') ? hash.slice(1) : hash
+  }
+
+  function buildShareUrl(hash) {
+    const normalized = normalizeHash(hash)
+    const hashSuffix = normalized ? ('#' + encodeURIComponent(normalized)) : ''
+    if (location.origin === 'null') {
+      const base = location.href.split('#')[0]
+      return base + hashSuffix
+    }
+    return location.origin + buildUrl(normalized)
+  }
+
+  async function refreshUrlMetrics(versionAtSchedule = contentVersion) {
+    if (previewHash || encryptedContent) {
+      const url = location.href
+      urlMetrics = {
+        url,
+        size: new Blob([url]).size,
+        hash: getHashFromUrl(),
+        version: contentVersion
+      }
+      return urlMetrics
+    }
+    const hash = await getShortestHash(blocks)
+    if (versionAtSchedule !== contentVersion) return null
+    const url = buildShareUrl(hash)
+    urlMetrics = { url, size: new Blob([url]).size, hash, version: versionAtSchedule }
+    return urlMetrics
+  }
+
+  function syncUrlMetricsToLocation() {
+    const url = location.href
+    urlMetrics = {
+      url,
+      size: new Blob([url]).size,
+      hash: getHashFromUrl(),
+      version: contentVersion
+    }
+  }
+
+  const scheduleUrlMetricsUpdate = debounce(350, () => {
+    const versionAtSchedule = contentVersion
+    refreshUrlMetrics(versionAtSchedule).then(metrics => {
+      if (metrics && metrics.version === contentVersion) {
+        updateStatusBar()
+        updateQR()
+      }
+    })
+  })
+
   function getBaseUrlLength() {
     return (location.origin + location.pathname + location.search + '#').length
   }
@@ -3629,7 +3708,10 @@
   }
 
   function isAtInputLimit() {
-    return estimateUrlSizeFromBlocks(blocks) >= URL_THRESHOLDS.danger
+    const size = (urlMetrics.version === contentVersion)
+      ? urlMetrics.size
+      : new Blob([location.href]).size
+    return size >= URL_THRESHOLDS.danger
   }
 
   function applyLimitState() {
@@ -3687,8 +3769,16 @@
   }
 
   function updateStatusBar() {
-    const url = location.href
-    const size = new Blob([url]).size
+    if (!previewHash && !encryptedContent && urlMetrics.version !== contentVersion) {
+      scheduleUrlMetricsUpdate()
+    }
+    const useLocation = previewHash || encryptedContent
+    const url = useLocation
+      ? location.href
+      : ((urlMetrics.version === contentVersion) ? urlMetrics.url : location.href)
+    const size = useLocation
+      ? new Blob([url]).size
+      : ((urlMetrics.version === contentVersion) ? urlMetrics.size : new Blob([url]).size)
     const percent = Math.min(100, (size / URL_THRESHOLDS.critical) * 100)
     
     // Update progress bar
@@ -3719,8 +3809,13 @@
 
   // Tooltip interaction
   document.getElementById('size-progress')?.addEventListener('click', () => {
-    const url = location.href
-    const size = new Blob([url]).size
+    const useLocation = previewHash || encryptedContent
+    const url = useLocation
+      ? location.href
+      : ((urlMetrics.version === contentVersion) ? urlMetrics.url : location.href)
+    const size = useLocation
+      ? new Blob([url]).size
+      : ((urlMetrics.version === contentVersion) ? urlMetrics.size : new Blob([url]).size)
     
     let status = 'warning'
     if (size > URL_THRESHOLDS.critical) status = 'critical'
@@ -3755,6 +3850,8 @@
 
   function scheduleSave() {
     if (saveTimeout) clearTimeout(saveTimeout)
+    contentVersion += 1
+    scheduleUrlMetricsUpdate()
     saveTimeout = setTimeout(() => {
       if (typeof requestIdleCallback !== 'undefined') {
         requestIdleCallback(() => save(), { timeout: 2000 })
@@ -3772,6 +3869,13 @@
     const head = getHeadHash()
     const prevHash = head || (getLocalVersions()[0]?.hash) || null
     const hash = '#' + await getShortestHash(blocks)
+    const shareUrl = buildShareUrl(hash)
+    urlMetrics = {
+      url: shareUrl,
+      size: new Blob([shareUrl]).size,
+      hash: hash.slice(1),
+      version: contentVersion
+    }
     
     if (getHashFromUrl() !== hash.slice(1)) {
       history.replaceState({}, '', buildUrl(hash))
@@ -3859,6 +3963,8 @@
         }
       }
     }
+    contentVersion = 0
+    syncUrlMetricsToLocation()
     
     if (!blocks.length) blocks = [createBlock('p', '')]
     
@@ -3936,6 +4042,8 @@
     } catch (e) {}
     
     history.replaceState({}, '', buildUrl(''))
+    contentVersion = 0
+    syncUrlMetricsToLocation()
     updateTitle()
     updateQR()
     updateStatusBar()
@@ -4002,6 +4110,9 @@
     theme = t
     applyTheme(t)
     history.replaceState({}, '', buildUrl())
+    syncUrlMetricsToLocation()
+    updateStatusBar()
+    updateQR()
   }
 
   function initTheme() {
@@ -4011,6 +4122,7 @@
       history.replaceState({}, '', buildUrl())
     }
     applyTheme(theme)
+    syncUrlMetricsToLocation()
     document.getElementById('theme-toggle')?.addEventListener('click', () => {
       setTheme(theme === 'dark' ? 'light' : 'dark')
     })
@@ -4425,6 +4537,8 @@
       pushLocalVersion(mergedHash, [head, source].filter(Boolean))
       try { localStorage.setItem('hash', mergedHash) } catch (e) {}
       history.replaceState({}, '', buildUrl(mergedHash))
+      contentVersion = 0
+      syncUrlMetricsToLocation()
       versionRedoStack = []
       blocks = mergedBlocks
       renderAllBlocks()
@@ -4490,6 +4604,8 @@
     }
     
     history.replaceState({}, '', buildUrl(head || ''))
+    contentVersion = 0
+    syncUrlMetricsToLocation()
     previewHash = null
     
     const wrap = document.getElementById('editor-wrap')
@@ -4532,6 +4648,8 @@
     await setFromHash(parent)
     try { localStorage.setItem('hash', parent) } catch (e) {}
     history.replaceState({}, '', buildUrl(parent))
+    contentVersion = 0
+    syncUrlMetricsToLocation()
     
     updateTitle()
     updateQR()
@@ -4550,6 +4668,8 @@
     await setFromHash(next)
     try { localStorage.setItem('hash', next) } catch (e) {}
     history.replaceState({}, '', buildUrl(next))
+    contentVersion = 0
+    syncUrlMetricsToLocation()
     
     updateTitle()
     updateQR()
@@ -4567,6 +4687,8 @@
     if (head) {
       await setFromHash(head)
       history.replaceState({}, '', buildUrl(head))
+      contentVersion = 0
+      syncUrlMetricsToLocation()
     }
     clearVersionHistory()
     updateTitle()
@@ -4604,14 +4726,6 @@
     setTimeout(() => notification.classList.remove('visible'), 2000)
   }
 
-  function debounce(ms, fn) {
-    let timer
-    return (...args) => {
-      clearTimeout(timer)
-      timer = setTimeout(() => fn(...args), ms)
-    }
-  }
-
   function updateLockButtonVisibility() {
     const lockBtn = document.getElementById('lock-btn')
     if (!lockBtn) return
@@ -4631,7 +4745,9 @@
   function updateQR() {
     const el = document.getElementById('qrcode')
     if (!el || typeof qrcode !== 'function') return
-    const url = location.href
+    const url = (previewHash || encryptedContent)
+      ? location.href
+      : ((urlMetrics.version === contentVersion) ? urlMetrics.url : location.href)
     try {
       const qr = qrcode(0, 'L')
       qr.addData(url)
@@ -4870,12 +4986,24 @@
       notify('New note')
     })
 
-    document.getElementById('share-copy-link')?.addEventListener('click', e => {
+    document.getElementById('share-copy-link')?.addEventListener('click', async e => {
       e.preventDefault()
       if (!navigator.clipboard) { alert('Clipboard not supported'); return }
-      navigator.clipboard.writeText(location.href)
-      notify('Link copied')
-      closeAllDropdowns()
+      try {
+        if (!previewHash && !encryptedContent) {
+          await save()
+          await refreshUrlMetrics(contentVersion)
+        }
+        const url = (previewHash || encryptedContent)
+          ? location.href
+          : ((urlMetrics.version === contentVersion) ? urlMetrics.url : location.href)
+        await navigator.clipboard.writeText(url)
+        notify('Link copied')
+      } catch (err) {
+        notify('Could not copy link')
+      } finally {
+        closeAllDropdowns()
+      }
     })
     
     document.getElementById('share-export-txt')?.addEventListener('click', e => {
@@ -4937,6 +5065,8 @@
         const hashStr = await encryptBlocks(blocks, password)
         const hash = '#' + hashStr
         history.replaceState({}, '', buildUrl(hash))
+        contentVersion = 0
+        syncUrlMetricsToLocation()
         try {
           pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
           localStorage.setItem('hash', hash)
@@ -4980,14 +5110,30 @@
       document.getElementById('editor-wrap')?.classList.remove('encrypted-mode')
       updateLockButtonVisibility()
       document.getElementById('unlock-password').value = ''
+      renderAllBlocks()
+
+      if (previewHash) {
+        const wrap = document.getElementById('editor-wrap')
+        const text = document.getElementById('preview-banner-text')
+        if (wrap) wrap.classList.add('preview-mode')
+        if (text) text.textContent = 'Previewing ' + formatVersionLabel(previewHash)
+        updateTitle()
+        updateQR()
+        updateStatusBar()
+        renderHistoryGraph()
+        notify('Unlocked preview')
+        return
+      }
+
       const prevHead = getHeadHash()
       const hash = '#' + await getShortestHash(blocks)
       history.replaceState({}, '', buildUrl(hash))
+      contentVersion = 0
+      syncUrlMetricsToLocation()
       try {
         pushLocalVersion(hash, prevHead ? [prevHead] : (getLocalVersions()[0]?.hash ? [getLocalVersions()[0].hash] : []))
         localStorage.setItem('hash', hash)
       } catch (e) {}
-      renderAllBlocks()
       updateTitle()
       updateQR()
       updateStatusBar()

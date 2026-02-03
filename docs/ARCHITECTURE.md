@@ -119,6 +119,27 @@ flowchart TB
 - `hash` — Current head hash (compressed content)
 - `kheMessage_localVersions` — Array of `{ hash, t, parents }` entries (max 50)
 
+## Share URL + Size Metrics
+
+The UI (status bar, QR, and copy link) is driven by a computed **share URL** rather than raw `location.href`:
+
+1. **Compute hash** from current blocks (`getShortestHash`).
+2. **Build share URL**: `origin + path + ?theme + #hash`.
+3. **Cache size** in bytes to avoid expensive recomputation on every keystroke.
+
+This ensures the size indicator and QR code reflect the **actual shareable link** (not a stale hash).
+
+### Size Thresholds
+
+The status bar uses conservative thresholds to warn early:
+
+- **safe**: 2 KB
+- **warning**: 4 KB
+- **danger**: 8 KB (input blocked)
+- **critical**: 16 KB (link likely fails in many contexts)
+
+These are **heuristics**. Real platform limits vary, so the app prevents writes past the danger threshold to avoid broken links.
+
 ## Version History
 
 kheMessage implements a Git-like version history with branching and merge support.
@@ -198,3 +219,7 @@ flowchart TB
 ```
 
 Cache version is defined in `sw.js` as `CACHE_VERSION`; updating it invalidates old caches.
+
+## Encryption Context
+
+Password lock uses WebCrypto (AES‑GCM + PBKDF2). WebCrypto only works in secure contexts, so encryption is available on **HTTPS or localhost**.

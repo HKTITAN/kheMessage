@@ -20,19 +20,19 @@ A line-by-line map of the main application file and key functions.
 | ~2310–2459 | Binary serialization | `serializeBlocks`, `deserializeBlocks` |
 | ~2459–2525 | Base85 encoding | `encodeBase85`, `decodeBase85`, `looksLikeBase85` |
 | ~2525–2585 | Compression | `compressBlocks`, `decompressToBlocks` |
-| ~2585–2781 | Encryption | `encryptBlocks`, `decryptBlocks`, AES-GCM, PBKDF2 |
+| ~2585–2781 | Encryption | `encryptBlocks`, `decryptToBlocks`, AES-GCM, PBKDF2 |
 | ~2781–3030 | Block rendering | `renderBlocks`, `blocksToDOM`, `domToBlocks` |
 | ~3030–3382 | Block operations | `insertBlock`, `deleteBlock`, `moveBlock`, `setBlockType` |
 | ~3382–3471 | Slash menu | Slash command handling, type selection |
 | ~3471–3501 | Multi-select | Shift+click range selection |
 | ~3501–3597 | Drag and drop | Block reordering, indent level on drop |
-| ~3597–3624 | URL limit | 8KB enforcement, typing disabled at limit |
-| ~3624–3731 | Status bar | URL size display, size warnings |
-| ~3731–3908 | Save/load | `save`, `set`, `setFromHash`, `get`, `blocksToHash`, `hashToBlocks` |
-| ~3908–3962 | Theme | Light/dark toggle, URL param, system preference |
-| ~3962–4520 | Version history | `pushLocalVersion`, `versionUndo`, `versionRedo`, `enterPreview`, `exitPreview` |
-| ~4520–4588 | UI helpers | `setSaveStatus`, `notify`, `debounce`, `updateQR` |
-| ~4588–4727 | Export | `downloadTXT`, `downloadHTML`, `downloadMD` |
+| ~3597–3720 | URL metrics + limit | `buildShareUrl`, URL size caching, 8KB enforcement |
+| ~3720–3840 | Status bar | URL size display, size warnings |
+| ~3840–4030 | Save/load | `save`, `load`, `setFromHash`, URL updates |
+| ~4030–4125 | Theme | Light/dark toggle, URL param, system preference |
+| ~4125–4685 | Version history | `pushLocalVersion`, `versionUndo`, `versionRedo`, `enterPreview`, `exitPreview` |
+| ~4685–4756 | UI helpers | `setSaveStatus`, `notify`, `updateQR` |
+| ~4756–4940 | Export | `downloadTXT`, `downloadHTML`, `downloadMD` |
 | ~4727–5100 | Initialization | DOM ready, hash load, event listeners, Editor setup |
 
 ## Key Functions
@@ -42,11 +42,10 @@ A line-by-line map of the main application file and key functions.
 | Function | Description |
 |----------|-------------|
 | `save()` | Gets blocks → compresses → updates URL hash + localStorage, pushes version |
-| `set(hash)` | Decompresses hash → sets blocks → renders DOM |
-| `setFromHash(hash)` | Async version of `set`; handles encrypted content |
-| `get()` | Returns string representation of content + style |
-| `blocksToHash(blocks)` | Serializes and compresses blocks to hash string |
-| `hashToBlocks(hashStr)` | Decompresses and deserializes hash to blocks |
+| `load()` | Resolves hash from URL/localStorage → renders blocks |
+| `setFromHash(hash)` | Async load; handles encrypted content |
+| `getShortestHash(blocks)` | Computes best hash encoding (binary vs compact) |
+| `buildShareUrl(hash)` | Builds share URL for size/QR/copy |
 
 ### Version History
 
@@ -58,6 +57,14 @@ A line-by-line map of the main application file and key functions.
 | `enterPreview(hash)` | Loads version read-only, shows preview banner |
 | `exitPreview()` | Returns to current head, editable |
 | `clearVersionHistory()` | Clears all history (Reset) |
+
+### URL Size + Share Metrics
+
+| Function | Description |
+|----------|-------------|
+| `refreshUrlMetrics()` | Computes cached share URL + byte size |
+| `syncUrlMetricsToLocation()` | Syncs metrics to `location.href` (preview/lock) |
+| `isAtInputLimit()` | Enforces danger threshold (8 KB) based on share URL size |
 
 ### Block Types (BLOCK_TYPES)
 
